@@ -1,7 +1,7 @@
-package org.jetbrains.plugins.template.services
+package com.github.zaskar9.oberonideplugin.services
 
 import com.intellij.openapi.project.Project
-import org.jetbrains.plugins.template.MyBundle
+import com.github.zaskar9.oberonideplugin.MyBundle
 
 class MyProjectService(project: Project) {
 
