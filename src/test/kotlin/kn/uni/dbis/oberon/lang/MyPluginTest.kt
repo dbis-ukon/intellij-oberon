@@ -1,4 +1,4 @@
-package com.github.zaskar9.oberonideplugin
+package kn.uni.dbis.oberon.lang
 
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.psi.xml.XmlFile

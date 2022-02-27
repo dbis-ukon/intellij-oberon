@@ -1,7 +1,7 @@
-package com.github.zaskar9.oberonideplugin.services
+package kn.uni.dbis.oberon.lang.services
 
 import com.intellij.openapi.project.Project
-import com.github.zaskar9.oberonideplugin.MyBundle
+import kn.uni.dbis.oberon.lang.MyBundle
 
 class MyProjectService(project: Project) {
 

@@ -1,0 +1,179 @@
+{
+  parserClass="kn.uni.dbis.oberon.lang.parser.OberonParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  elementTypeHolderClass="kn.uni.dbis.oberon.lang.psi.OberonTypes"
+
+  elementTypeClass="kn.uni.dbis.oberon.lang.psi.OberonElementType"
+  tokenTypeClass="kn.uni.dbis.oberon.lang.psi.OberonTokenType"
+
+  psiClassPrefix="Oberon"
+  psiImplClassSuffix="Impl"
+  psiPackage="kn.uni.dbis.oberon.lang.psi"
+  psiImplPackage="kn.uni.dbis.oberon.lang.psi.impl"
+  psiImplUtilClass="kn.uni.dbis.oberon.lang.psi.impl.OberonPsiImplUtil"
+
+  tokens = [
+
+    // Basics
+    COLON = ":"
+    COMMA = ","
+    LBRACE = "{"
+    LBRACK = "["
+    LPAREN = "("
+    PERIOD = "."
+    PIPE = "|"
+    RBRACE = "}"
+    RBRACK = "]"
+    RPAREN = ")"
+    SEMICOLON = ";"
+    VARARGS = "..."
+
+    // Keywords
+    KW_AND = "AND"
+    KW_ARRAY = "ARRAY"
+    KW_BEGIN = "BEGIN"
+    KW_BOOLEAN = "BOOLEAN"
+    KW_BY = "BY"
+    KW_CONST = "CONST"
+    KW_DO = "DO"
+    KW_ELSE = "ELSE"
+    KW_ELSIF = "ELSIF"
+    KW_END = "END"
+    KW_EXIT = "EXIT"
+    KW_EXTERN = "EXTERN"
+    KW_FALSE = "FALSE"
+    KW_FOR = "FOR"
+    KW_FUNCTION = "FUNCTION"
+    KW_IF = "IF"
+    KW_INTEGER = "INTEGER"
+    KW_LONGINT = "LONGINT"
+    KW_LONGREAL = "LONGREAL"
+    KW_LOOP = "LOOP"
+    KW_MODULE = "MODULE"
+    KW_NEW = "NEW"
+    KW_OF = "OF"
+    KW_PROCEDURE = "PROCEDURE"
+    KW_REAL = "REAL"
+    KW_RECORD = "RECORD"
+    KW_REPEAT = "REPEAT"
+    KW_RETURN = "RETURN"
+    KW_STRING = "STRING"
+    KW_THEN = "THEN"
+    KW_TO = "TO"
+    KW_TRUE = "TRUE"
+    KW_TYPE = "TYPE"
+    KW_UNTIL = "UNTIL"
+    KW_VAR = "VAR"
+    KW_WITH = "WITH"
+    KW_WHILE = "WHILE"
+
+    // Operators
+    OP_AND = "&"
+    OP_BECOMES = ":="
+    OP_DIV = "DIV"
+    OP_EQ = "="
+    OP_GEQ = ">="
+    OP_GT = ">"
+    OP_LEQ = "<="
+    OP_LT = "<"
+    OP_MINUS = "-"
+    OP_MOD = "MOD"
+    OP_NEQ = "#"
+    OP_NOT = "~"
+    OP_OR = "OR"
+    OP_PLUS = "+"
+    OP_TIMES = "*"
+
+    // Literals
+    IDENTIFIER = "regexp:[a-zA-Z][a-zA-Z0-9]*"
+    INTEGER_LITERAL = "regexp:(0|0H)|[A-Z1-9][A-Z0-9]*(H)?"
+    STRING_LITERAL = 'regexp:"(\\\s*\n\s*\\|\\"|[^"\n])*"'
+    REAL_LITERAL = "regexp:([0-9]+\.[0-9]+((e|E)(\+|\-)?[0-9]+)?|[0-9]+((e|E)(\+|\-)?[0-9]+))"
+
+    // Comment
+    COMMENT = "regexp:\(\*.*?\*\)"
+  ]
+}
+
+module ::= KW_MODULE ident SEMICOLON declarations [ KW_BEGIN statement_sequence ] KW_END ident PERIOD
+
+private meta comma_list ::= <<p>> (COMMA <<p>>)*
+private meta semicolon_list ::= <<p>> (SEMICOLON <<p>>)*
+
+ident ::= IDENTIFIER
+
+integer ::= INTEGER_LITERAL
+
+real ::= REAL_LITERAL
+
+string ::= STRING_LITERAL
+
+boolean ::= KW_FALSE | KW_TRUE
+
+builtin_type ::= KW_INTEGER | KW_LONGINT | KW_REAL | KW_LONGREAL | KW_BOOLEAN | KW_STRING
+
+ident_list ::= <<comma_list ident>>
+
+statement_sequence ::= <<semicolon_list statement>>
+
+
+declarations ::= [ const_declarations ] [ type_declarations ] [ var_declarations ] ( procedure_declaration )*
+
+const_declarations ::= KW_CONST ( ident OP_EQ expression SEMICOLON )+
+
+type_declarations ::=  KW_TYPE ( ident OP_EQ type SEMICOLON )+
+
+type ::= ident | array_type | record_type | builtin_type
+
+array_type ::= KW_ARRAY expression KW_OF type
+
+record_type ::= KW_RECORD <<semicolon_list record_field>> KW_END
+
+record_field ::= ident_list COLON type
+
+var_declarations ::=  KW_VAR ( ident_list COLON type SEMICOLON )+
+
+procedure_declaration ::= procedure_heading SEMICOLON ( procedure_body ident | KW_EXTERN ) SEMICOLON
+
+procedure_heading ::= KW_PROCEDURE ident [ formal_parameters ] [ COLON type ]
+
+procedure_body ::= declarations [ KW_BEGIN statement_sequence ] KW_END
+
+formal_parameters ::= LPAREN [ <<semicolon_list fp_section>> ] RPAREN
+
+fp_section ::= ( [ "VAR" ] ident_list COLON type | VARARGS )
+
+statement ::= ( assignment | procedure_call | if_statement | /* case_statement | */
+                while_statement | repeat_statement | for_statement | loop_statement |
+                /* with_statement | */ KW_EXIT | KW_RETURN [ expression ] )
+
+assignment ::= ident ( selector )* OP_BECOMES expression
+
+selector ::= PERIOD ident | LBRACK expression RBRACK
+
+procedure_call ::= ident [ actual_parameters ]
+
+actual_parameters ::= LPAREN [ <<comma_list expression>> ] RPAREN
+
+if_statement ::= KW_IF expression KW_THEN statement_sequence
+                 { KW_ELSIF expression KW_THEN statement_sequence }
+                 [ KW_ELSE statement_sequence ] KW_END
+
+loop_statement ::= KW_LOOP statement_sequence KW_END
+
+while_statement ::= KW_WHILE expression KW_DO statement_sequence KW_END
+
+repeat_statement ::= KW_REPEAT statement_sequence KW_UNTIL expression
+
+for_statement ::= KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO statement_sequence KW_END
+
+expression ::= simple_expression [ ( OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ ) simple_expression
+
+simple_expression ::= [ OP_PLUS | OP_MINUS ] term ( ( OP_PLUS | OP_MINUS | OP_OR ) term )*
+
+term ::= factor ( ( OP_TIMES | OP_DIV | OP_MOD | OP_AND ) factor )*
+
+factor ::= ( ident [ actual_parameters ] { selector } |
+             integer | real | boolean | string | LPAREN expression RPAREN | OP_NOT factor )

@@ -1,4 +1,4 @@
-package com.github.zaskar9.oberonideplugin
+package kn.uni.dbis.oberon.lang
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls

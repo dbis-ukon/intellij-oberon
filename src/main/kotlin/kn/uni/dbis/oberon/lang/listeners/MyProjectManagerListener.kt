@@ -1,9 +1,9 @@
-package com.github.zaskar9.oberonideplugin.listeners
+package kn.uni.dbis.oberon.lang.listeners
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import com.github.zaskar9.oberonideplugin.services.MyProjectService
+import kn.uni.dbis.oberon.lang.services.MyProjectService
 
 internal class MyProjectManagerListener : ProjectManagerListener {
 
