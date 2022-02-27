@@ -1,14 +1,8 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>kn.uni.dbis.oberon.lang</id>
-    <name>Oberon IDE Plugin</name>
+    <name>Oberon</name>
     <vendor url="https://dbis.uni.kn" email="dbis@uni-konstanz.de">University of Konstanz (DBIS)</vendor>
-    <description>
-        <![CDATA[
-          Provides a boilerplate template for easier plugin creation. <br/>
-          Speed up the setup phase of plugin development for both new and experienced developers.
-        ]]>
-    </description>
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">

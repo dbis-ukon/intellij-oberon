@@ -169,11 +169,11 @@ repeat_statement ::= KW_REPEAT statement_sequence KW_UNTIL expression
 
 for_statement ::= KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO statement_sequence KW_END
 
-expression ::= simple_expression [ ( OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ ) simple_expression
+expression ::= simple_expression [ ( OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ ) simple_expression ]
 
 simple_expression ::= [ OP_PLUS | OP_MINUS ] term ( ( OP_PLUS | OP_MINUS | OP_OR ) term )*
 
 term ::= factor ( ( OP_TIMES | OP_DIV | OP_MOD | OP_AND ) factor )*
 
-factor ::= ( ident [ actual_parameters ] { selector } |
+factor ::= ( ident [ actual_parameters ] ( selector )*  |
              integer | real | boolean | string | LPAREN expression RPAREN | OP_NOT factor )
