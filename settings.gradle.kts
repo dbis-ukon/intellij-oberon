@@ -1,1 +1,1 @@
-rootProject.name = "oberon-ide-plugin"
+rootProject.name = "intellij-oberon"
