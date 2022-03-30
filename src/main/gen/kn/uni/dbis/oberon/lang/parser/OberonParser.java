@@ -859,13 +859,13 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LW_LOOP <<semicolon_list statement>> KW_END
+  // KW_LOOP <<semicolon_list statement>> KW_END
   public static boolean loop_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "loop_statement")) return false;
-    if (!nextTokenIs(b, LW_LOOP)) return false;
+    if (!nextTokenIs(b, KW_LOOP)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, LW_LOOP);
+    r = consumeToken(b, KW_LOOP);
     r = r && semicolon_list(b, l + 1, OberonParser::statement);
     r = r && consumeToken(b, KW_END);
     exit_section_(b, m, LOOP_STATEMENT, r);

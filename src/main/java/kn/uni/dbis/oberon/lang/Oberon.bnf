@@ -157,7 +157,7 @@ while_statement ::= KW_WHILE expression KW_DO <<semicolon_list statement>>
                     KW_END
 repeat_statement ::= KW_REPEAT <<semicolon_list statement>> KW_UNTIL expression
 for_statement ::= KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO <<semicolon_list statement>> KW_END
-loop_statement ::= LW_LOOP <<semicolon_list statement>> KW_END
+loop_statement ::= KW_LOOP <<semicolon_list statement>> KW_END
 
 procedure_declaration ::= procedure_heading SEMICOLON ( procedure_body ident | KW_EXTERN )
 procedure_heading ::= KW_PROCEDURE identdef [ formal_parameters ]

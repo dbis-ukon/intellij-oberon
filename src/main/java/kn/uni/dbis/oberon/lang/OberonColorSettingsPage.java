@@ -15,13 +15,18 @@ public class OberonColorSettingsPage implements ColorSettingsPage {
 
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
             new AttributesDescriptor("Keywords", OberonSyntaxHighlighter.KEYWORD),
-            new AttributesDescriptor("Operator", OberonSyntaxHighlighter.OPERATOR),
+            new AttributesDescriptor("Built-in type", OberonSyntaxHighlighter.TYPE),
             new AttributesDescriptor("Identifier", OberonSyntaxHighlighter.IDENTIFIER),
-            new AttributesDescriptor("Bad value", OberonSyntaxHighlighter.BAD_CHARACTER),
+            new AttributesDescriptor("Operator", OberonSyntaxHighlighter.OPERATOR),
+            new AttributesDescriptor("Predefined symbol", OberonSyntaxHighlighter.SYMBOL),
             new AttributesDescriptor("Comment", OberonSyntaxHighlighter.COMMENT),
-            new AttributesDescriptor("String", OberonSyntaxHighlighter.STRING),
+            new AttributesDescriptor("Constant", OberonSyntaxHighlighter.CONSTANT),
+            new AttributesDescriptor("Boolean", OberonSyntaxHighlighter.BOOLEAN),
             new AttributesDescriptor("Integer", OberonSyntaxHighlighter.INTEGER),
-            new AttributesDescriptor("Real", OberonSyntaxHighlighter.REAL)
+            new AttributesDescriptor("Real", OberonSyntaxHighlighter.REAL),
+            new AttributesDescriptor("String", OberonSyntaxHighlighter.STRING),
+            new AttributesDescriptor("Nil", OberonSyntaxHighlighter.NIL),
+            new AttributesDescriptor("Bad value", OberonSyntaxHighlighter.BAD_CHARACTER)
     };
 
     @Nullable

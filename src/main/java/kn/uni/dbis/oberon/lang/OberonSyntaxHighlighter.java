@@ -1,5 +1,6 @@
 package kn.uni.dbis.oberon.lang;
 
+import b.f.O;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
@@ -22,6 +23,10 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
 
     public static final TextAttributesKey KEYWORD =
             createTextAttributesKey("OBERON_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
+    public static final TextAttributesKey TYPE =
+            createTextAttributesKey("OBERON_TYPE", DefaultLanguageHighlighterColors.CLASS_NAME);
+    public static final TextAttributesKey IDENTIFIER =
+            createTextAttributesKey("OBERON_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER);
     public static final TextAttributesKey OPERATOR =
             createTextAttributesKey("OBERON_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
     public static final TextAttributesKey SYMBOL =
@@ -39,19 +44,19 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey PARENTHESES =
             createTextAttributesKey("OBERON_PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
     public static final TextAttributesKey COMMENT =
-            createTextAttributesKey("OBERON_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
+            createTextAttributesKey("OBERON_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
+    public static final TextAttributesKey CONSTANT =
+            createTextAttributesKey("OBERON_CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);
     public static final TextAttributesKey BOOLEAN =
             createTextAttributesKey("OBERON_BOOLEAN", DefaultLanguageHighlighterColors.CONSTANT);
+    public static final TextAttributesKey NIL =
+            createTextAttributesKey("OBERON_NIL", DefaultLanguageHighlighterColors.CONSTANT);
     public static final TextAttributesKey INTEGER =
             createTextAttributesKey("OBERON_INTEGER", DefaultLanguageHighlighterColors.NUMBER);
     public static final TextAttributesKey REAL =
             createTextAttributesKey("OBERON_REAL", DefaultLanguageHighlighterColors.NUMBER);
-    public static final TextAttributesKey IDENTIFIER =
-            createTextAttributesKey("OBERON_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER);
     public static final TextAttributesKey STRING =
-            createTextAttributesKey("OBERON_CONSTANT", DefaultLanguageHighlighterColors.STRING);
-    public static final TextAttributesKey BUILTIN_TYPE =
-            createTextAttributesKey("OBERON_BUILTIN_TYPE", DefaultLanguageHighlighterColors.KEYWORD);
+            createTextAttributesKey("OBERON_STRING", DefaultLanguageHighlighterColors.STRING);
 
     public static final TextAttributesKey BAD_CHARACTER =
             createTextAttributesKey("OBERON_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
@@ -74,6 +79,7 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
                 OberonTypes.KW_ARRAY,
                 OberonTypes.KW_BEGIN,
                 OberonTypes.KW_BY,
+                OberonTypes.KW_CASE,
                 OberonTypes.KW_CONST,
                 OberonTypes.KW_DO,
                 OberonTypes.KW_ELSE,
@@ -84,10 +90,12 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
                 OberonTypes.KW_FOR,
                 OberonTypes.KW_FUNCTION,
                 OberonTypes.KW_IF,
+                OberonTypes.KW_IMPORT,
                 OberonTypes.KW_LOOP,
                 OberonTypes.KW_MODULE,
                 OberonTypes.KW_NEW,
                 OberonTypes.KW_OF,
+                OberonTypes.KW_POINTER,
                 OberonTypes.KW_PROCEDURE,
                 OberonTypes.KW_RECORD,
                 OberonTypes.KW_REPEAT,
@@ -113,7 +121,7 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
                 OberonTypes.KW_REAL,
                 OberonTypes.KW_STRING
             ),
-            BUILTIN_TYPE
+            TYPE
         );
 
         // Operators
@@ -121,10 +129,14 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
             Arrays.asList(
                 OberonTypes.OP_AND,
                 OberonTypes.OP_BECOMES,
+                OberonTypes.OP_DEREF,
                 OberonTypes.OP_DIV,
+                OberonTypes.OP_DIVIDE,
                 OberonTypes.OP_EQ,
                 OberonTypes.OP_GEQ,
                 OberonTypes.OP_GT,
+                OberonTypes.OP_IN,
+                OberonTypes.OP_IS,
                 OberonTypes.OP_LEQ,
                 OberonTypes.OP_LT,
                 OberonTypes.OP_MINUS,
@@ -145,6 +157,7 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
 
         // Values
         keysPutEach(Arrays.asList(OberonTypes.KW_FALSE, OberonTypes.KW_TRUE), BOOLEAN);
+        keys.put(OberonTypes.KW_NIL, NIL);
         keys.put(OberonTypes.INTEGER_LITERAL, INTEGER);
         keys.put(OberonTypes.REAL_LITERAL, REAL);
         keys.put(OberonTypes.STRING_LITERAL, STRING);
@@ -157,7 +170,15 @@ public class OberonSyntaxHighlighter extends SyntaxHighlighterBase {
         keys.put(OberonTypes.SEMICOLON, SEMICOLON);
 
         // Catch all
-        keysPutEach(Arrays.asList(OberonTypes.COLON, OberonTypes.PIPE, OberonTypes.VARARGS), SYMBOL);
+        keysPutEach(
+            Arrays.asList(
+                OberonTypes.COLON,
+                OberonTypes.PIPE,
+                OberonTypes.RANGE,
+                OberonTypes.VARARGS
+            ),
+            SYMBOL
+        );
 
     }
 

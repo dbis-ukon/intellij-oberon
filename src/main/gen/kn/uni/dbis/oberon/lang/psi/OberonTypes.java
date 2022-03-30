@@ -107,7 +107,6 @@ public interface OberonTypes {
   IElementType LBRACE = new OberonTokenType("{");
   IElementType LBRACK = new OberonTokenType("[");
   IElementType LPAREN = new OberonTokenType("(");
-  IElementType LW_LOOP = new OberonTokenType("LW_LOOP");
   IElementType OP_AND = new OberonTokenType("&");
   IElementType OP_BECOMES = new OberonTokenType(":=");
   IElementType OP_DEREF = new OberonTokenType("^");

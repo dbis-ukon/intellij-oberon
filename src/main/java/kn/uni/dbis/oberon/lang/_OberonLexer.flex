@@ -40,9 +40,13 @@ COMMENT         = "(*" !([^]* "*)" [^]*) ("*)")?
 
 IDENTIFIER      = [:jletter:][:jletterdigit:]*
 
-INTEGER_LITERAL = (0|0H)|[A-Z1-9][A-Z0-9]*(H)?
+DECIMAL_LITERAL = 0 | [1-9][0-9]*
+HEX_LITERAL     = 0H | [1-9A-F][0-9A-F]*H
+INTEGER_LITERAL = {DECIMAL_LITERAL} | {HEX_LITERAL}
+
+REAL_LITERAL    = ([0-9]+\.[0-9]+([eE](\+|\-)?[0-9]+)?|[0-9]+([eE](\+|\-)?[0-9]+))
+
 STRING_LITERAL  = \"(\\[ \t\n\x0B\f\r]*\n[ \t\n\x0B\f\r]*\\|\\\"|[^\"\n])*\"
-REAL_LITERAL    = ([0-9]+\.[0-9]+((e|E)(\+|\-)?[0-9]+)?|[0-9]+((e|E)(\+|\-)?[0-9]+))
 
 %%
 <YYINITIAL> {
