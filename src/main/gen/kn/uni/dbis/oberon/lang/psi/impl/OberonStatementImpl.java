@@ -35,8 +35,8 @@ public class OberonStatementImpl extends ASTWrapperPsiElement implements OberonS
 
   @Override
   @Nullable
-  public OberonExpression getExpression() {
-    return findChildByClass(OberonExpression.class);
+  public OberonCaseStatement getCaseStatement() {
+    return findChildByClass(OberonCaseStatement.class);
   }
 
   @Override

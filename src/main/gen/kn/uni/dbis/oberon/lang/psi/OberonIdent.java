@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface OberonIdent extends PsiElement {
 
-  @NotNull
-  PsiElement getIdentifier();
+  @Nullable
+  OberonBuiltinType getBuiltinType();
 
 }

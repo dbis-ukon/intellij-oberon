@@ -35,14 +35,8 @@ public class OberonProcedureHeadingImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
-  public OberonIdent getIdent() {
-    return findNotNullChildByClass(OberonIdent.class);
-  }
-
-  @Override
-  @Nullable
-  public OberonType getType() {
-    return findChildByClass(OberonType.class);
+  public OberonIdentdef getIdentdef() {
+    return findNotNullChildByClass(OberonIdentdef.class);
   }
 
 }

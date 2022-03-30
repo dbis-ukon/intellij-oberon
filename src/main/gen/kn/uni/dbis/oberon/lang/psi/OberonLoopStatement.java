@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface OberonLoopStatement extends PsiElement {
 
   @NotNull
-  OberonStatementSequence getStatementSequence();
+  List<OberonStatement> getStatementList();
 
 }

@@ -15,6 +15,7 @@
   psiImplUtilClass="kn.uni.dbis.oberon.lang.psi.impl.OberonPsiImplUtil"
 
   tokens = [
+    COMMENT="COMMENT"
 
     // Basics
     COLON = ":"
@@ -24,6 +25,7 @@
     LPAREN = "("
     PERIOD = "."
     PIPE = "|"
+    RANGE = ".."
     RBRACE = "}"
     RBRACK = "]"
     RPAREN = ")"
@@ -36,6 +38,7 @@
     KW_BEGIN = "BEGIN"
     KW_BOOLEAN = "BOOLEAN"
     KW_BY = "BY"
+    KW_CASE = "CASE"
     KW_CONST = "CONST"
     KW_DO = "DO"
     KW_ELSE = "ELSE"
@@ -47,13 +50,16 @@
     KW_FOR = "FOR"
     KW_FUNCTION = "FUNCTION"
     KW_IF = "IF"
+    KW_IMPORT = "IMPORT"
     KW_INTEGER = "INTEGER"
     KW_LONGINT = "LONGINT"
     KW_LONGREAL = "LONGREAL"
     KW_LOOP = "LOOP"
     KW_MODULE = "MODULE"
     KW_NEW = "NEW"
+    KW_NIL = "NIL"
     KW_OF = "OF"
+    KW_POINTER = "POINTER"
     KW_PROCEDURE = "PROCEDURE"
     KW_REAL = "REAL"
     KW_RECORD = "RECORD"
@@ -72,10 +78,14 @@
     // Operators
     OP_AND = "&"
     OP_BECOMES = ":="
+    OP_DEREF = "^"
     OP_DIV = "DIV"
+    OP_DIVIDE = "/"
     OP_EQ = "="
     OP_GEQ = ">="
     OP_GT = ">"
+    OP_IN = "IN"
+    OP_IS = "IS"
     OP_LEQ = "<="
     OP_LT = "<"
     OP_MINUS = "-"
@@ -85,95 +95,76 @@
     OP_OR = "OR"
     OP_PLUS = "+"
     OP_TIMES = "*"
-
-    // Literals
-    IDENTIFIER = "regexp:[a-zA-Z][a-zA-Z0-9]*"
-    INTEGER_LITERAL = "regexp:(0|0H)|[A-Z1-9][A-Z0-9]*(H)?"
-    STRING_LITERAL = 'regexp:"(\\\s*\n\s*\\|\\"|[^"\n])*"'
-    REAL_LITERAL = "regexp:([0-9]+\.[0-9]+((e|E)(\+|\-)?[0-9]+)?|[0-9]+((e|E)(\+|\-)?[0-9]+))"
-
-    // Comment
-    COMMENT = "regexp:\(\*.*?\*\)"
   ]
 }
 
-module ::= KW_MODULE ident SEMICOLON declarations [ KW_BEGIN statement_sequence ] KW_END ident PERIOD
+module ::= KW_MODULE ident SEMICOLON [ import_list ] declaration_sequence [ KW_BEGIN <<semicolon_list statement>> ] KW_END ident PERIOD
+import_list ::= KW_IMPORT <<comma_list import>> SEMICOLON
+import ::= ident [ OP_BECOMES ident ]
 
 private meta comma_list ::= <<p>> (COMMA <<p>>)*
 private meta semicolon_list ::= <<p>> (SEMICOLON <<p>>)*
 
-ident ::= IDENTIFIER
+ident ::= IDENTIFIER | builtin_type
+qualident ::= [ ident PERIOD ] ident
+identdef ::= ident [ OP_TIMES ]
 
-integer ::= INTEGER_LITERAL
-
-real ::= REAL_LITERAL
-
+number ::= INTEGER_LITERAL | REAL_LITERAL
 string ::= STRING_LITERAL
-
-boolean ::= KW_FALSE | KW_TRUE
 
 builtin_type ::= KW_INTEGER | KW_LONGINT | KW_REAL | KW_LONGREAL | KW_BOOLEAN | KW_STRING
 
-ident_list ::= <<comma_list ident>>
+const_declaration ::= identdef OP_EQ expression
 
-statement_sequence ::= <<semicolon_list statement>>
+type_declaration ::= identdef OP_EQ type
+type ::= qualident | array_type | record_type | pointer_type | procedure_type
+array_type ::= KW_ARRAY expression ( COMMAN expression )* KW_OF type
+record_type ::= KW_RECORD [ LPAREN qualident RPAREN ] [ <<semicolon_list field_list>> ] KW_END
+field_list ::= <<comma_list identdef>> COLON type
+pointer_type ::= KW_POINTER KW_TO type
+procedure_type ::= KW_PROCEDURE [ formal_parameters ]
 
+variable_declaration ::= <<comma_list identdef>> COLON type
 
-declarations ::= [ const_declarations ] [ type_declarations ] [ var_declarations ] ( procedure_declaration )*
-
-const_declarations ::= KW_CONST ( ident OP_EQ expression SEMICOLON )+
-
-type_declarations ::=  KW_TYPE ( ident OP_EQ type SEMICOLON )+
-
-type ::= ident | array_type | record_type | builtin_type
-
-array_type ::= KW_ARRAY expression KW_OF type
-
-record_type ::= KW_RECORD <<semicolon_list record_field>> KW_END
-
-record_field ::= ident_list COLON type
-
-var_declarations ::=  KW_VAR ( ident_list COLON type SEMICOLON )+
-
-procedure_declaration ::= procedure_heading SEMICOLON ( procedure_body ident | KW_EXTERN ) SEMICOLON
-
-procedure_heading ::= KW_PROCEDURE ident [ formal_parameters ] [ COLON type ]
-
-procedure_body ::= declarations [ KW_BEGIN statement_sequence ] KW_END
-
-formal_parameters ::= LPAREN [ <<semicolon_list fp_section>> ] RPAREN
-
-fp_section ::= ( [ "VAR" ] ident_list COLON type | VARARGS )
-
-statement ::= ( assignment | procedure_call | if_statement | /* case_statement | */
-                while_statement | repeat_statement | for_statement | loop_statement |
-                /* with_statement | */ KW_EXIT | KW_RETURN [ expression ] )
-
-assignment ::= ident ( selector )* OP_BECOMES expression
-
-selector ::= PERIOD ident | LBRACK expression RBRACK
-
-procedure_call ::= ident [ actual_parameters ]
-
+expression ::= simple_expression [ relation simple_expression ]
+relation ::= OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ | OP_IN | OP_IS
+simple_expression ::= [ OP_PLUS | OP_MINUS ] term ( and_operator term )*
+and_operator ::= OP_PLUS | OP_MINUS | OP_OR
+term ::= factor ( mult_operator factor )*
+mult_operator ::= OP_TIMES | OP_DIVIDE | OP_DIV | OP_MOD | OP_AND
+factor ::= number | string | KW_NIL | KW_TRUE | KW_FALSE | set | designator [ actual_parameters ] |
+           LPAREN expression RPAREN | OP_NOT factor
+designator ::= qualident ( selector )*
+selector ::= PERIOD ident | LBRACK <<comma_list expression>> RBRACK | OP_DEREF | LPAREN qualident RPAREN
+set ::= LBRACE [ <<comma_list element>> ] RBRACE
+element ::= expression [ RANGE expression ]
 actual_parameters ::= LPAREN [ <<comma_list expression>> ] RPAREN
 
-if_statement ::= KW_IF expression KW_THEN statement_sequence
-                 { KW_ELSIF expression KW_THEN statement_sequence }
-                 [ KW_ELSE statement_sequence ] KW_END
+statement ::= [ assignment | procedure_call | if_statement | case_statement |
+                while_statement | repeat_statement | for_statement | loop_statement |
+                /* with_statement | */ KW_EXIT ]
+assignment ::= designator OP_BECOMES expression
+procedure_call ::= designator [ actual_parameters ]
+if_statement ::= KW_IF expression KW_THEN <<semicolon_list statement>>
+                 ( KW_ELSIF expression KW_THEN <<semicolon_list statement>> )*
+                 [ KW_ELSE <<semicolon_list statement>> ] KW_END
+case_statement ::= KW_CASE expression KW_OF case ( PIPE case ) KW_END
+case ::= [ <<comma_list label_range>> COLON <<semicolon_list statement>> ]
+label_range ::= label [ RANGE label ]
+label ::= integer | string | qualident
+while_statement ::= KW_WHILE expression KW_DO <<semicolon_list statement>>
+                    ( KW_ELSIF expression KW_DO <<semicolon_list statement>> )*
+                    KW_END
+repeat_statement ::= KW_REPEAT <<semicolon_list statement>> KW_UNTIL expression
+for_statement ::= KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO <<semicolon_list statement>> KW_END
+loop_statement ::= LW_LOOP <<semicolon_list statement>> KW_END
 
-loop_statement ::= KW_LOOP statement_sequence KW_END
-
-while_statement ::= KW_WHILE expression KW_DO statement_sequence KW_END
-
-repeat_statement ::= KW_REPEAT statement_sequence KW_UNTIL expression
-
-for_statement ::= KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO statement_sequence KW_END
-
-expression ::= simple_expression [ ( OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ ) simple_expression ]
-
-simple_expression ::= [ OP_PLUS | OP_MINUS ] term ( ( OP_PLUS | OP_MINUS | OP_OR ) term )*
-
-term ::= factor ( ( OP_TIMES | OP_DIV | OP_MOD | OP_AND ) factor )*
-
-factor ::= ( ident [ actual_parameters ] ( selector )*  |
-             integer | real | boolean | string | LPAREN expression RPAREN | OP_NOT factor )
+procedure_declaration ::= procedure_heading SEMICOLON ( procedure_body ident | KW_EXTERN )
+procedure_heading ::= KW_PROCEDURE identdef [ formal_parameters ]
+procedure_body ::= declaration_sequence [ KW_BEGIN <<semicolon_list statement>> ] [ KW_RETURN expression ] KW_END
+declaration_sequence ::= [ KW_CONST ( const_declaration SEMICOLON )* ]
+                         [ KW_TYPE ( type_declaration SEMICOLON )* ]
+                         [ KW_VAR ( variable_declaration SEMICOLON )* ]
+                         ( procedure_declaration SEMICOLON )*
+formal_parameters ::= LPAREN [ <<semicolon_list fp_section>> ] RPAREN [ COLON qualident ]
+fp_section ::= ( [ KW_VAR ] <<comma_list ident>> COLON [ KW_ARRAY KW_OF ] qualident | VARARGS )

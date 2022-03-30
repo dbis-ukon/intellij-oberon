@@ -11,32 +11,20 @@ import static kn.uni.dbis.oberon.lang.psi.OberonTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import kn.uni.dbis.oberon.lang.psi.*;
 
-public class OberonTypeDeclarationsImpl extends ASTWrapperPsiElement implements OberonTypeDeclarations {
+public class OberonAndOperatorImpl extends ASTWrapperPsiElement implements OberonAndOperator {
 
-  public OberonTypeDeclarationsImpl(@NotNull ASTNode node) {
+  public OberonAndOperatorImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull OberonVisitor visitor) {
-    visitor.visitTypeDeclarations(this);
+    visitor.visitAndOperator(this);
   }
 
   @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof OberonVisitor) accept((OberonVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<OberonIdent> getIdentList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonIdent.class);
-  }
-
-  @Override
-  @NotNull
-  public List<OberonType> getTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonType.class);
   }
 
 }

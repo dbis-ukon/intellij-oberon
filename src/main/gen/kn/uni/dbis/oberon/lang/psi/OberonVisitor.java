@@ -11,6 +11,10 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAndOperator(@NotNull OberonAndOperator o) {
+    visitPsiElement(o);
+  }
+
   public void visitArrayType(@NotNull OberonArrayType o) {
     visitPsiElement(o);
   }
@@ -19,19 +23,31 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitBoolean(@NotNull OberonBoolean o) {
-    visitPsiElement(o);
-  }
-
   public void visitBuiltinType(@NotNull OberonBuiltinType o) {
     visitPsiElement(o);
   }
 
-  public void visitConstDeclarations(@NotNull OberonConstDeclarations o) {
+  public void visitCase(@NotNull OberonCase o) {
     visitPsiElement(o);
   }
 
-  public void visitDeclarations(@NotNull OberonDeclarations o) {
+  public void visitCaseStatement(@NotNull OberonCaseStatement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitConstDeclaration(@NotNull OberonConstDeclaration o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDeclarationSequence(@NotNull OberonDeclarationSequence o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDesignator(@NotNull OberonDesignator o) {
+    visitPsiElement(o);
+  }
+
+  public void visitElement(@NotNull OberonElement o) {
     visitPsiElement(o);
   }
 
@@ -40,6 +56,10 @@ public class OberonVisitor extends PsiElementVisitor {
   }
 
   public void visitFactor(@NotNull OberonFactor o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFieldList(@NotNull OberonFieldList o) {
     visitPsiElement(o);
   }
 
@@ -59,7 +79,7 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitIdentList(@NotNull OberonIdentList o) {
+  public void visitIdentdef(@NotNull OberonIdentdef o) {
     visitPsiElement(o);
   }
 
@@ -67,11 +87,35 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitInteger(@NotNull OberonInteger o) {
+  public void visitImport(@NotNull OberonImport o) {
+    visitPsiElement(o);
+  }
+
+  public void visitImportList(@NotNull OberonImportList o) {
+    visitPsiElement(o);
+  }
+
+  public void visitLabel(@NotNull OberonLabel o) {
+    visitPsiElement(o);
+  }
+
+  public void visitLabelRange(@NotNull OberonLabelRange o) {
     visitPsiElement(o);
   }
 
   public void visitLoopStatement(@NotNull OberonLoopStatement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitMultOperator(@NotNull OberonMultOperator o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNumber(@NotNull OberonNumber o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPointerType(@NotNull OberonPointerType o) {
     visitPsiElement(o);
   }
 
@@ -91,15 +135,19 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitReal(@NotNull OberonReal o) {
+  public void visitProcedureType(@NotNull OberonProcedureType o) {
     visitPsiElement(o);
   }
 
-  public void visitRecordField(@NotNull OberonRecordField o) {
+  public void visitQualident(@NotNull OberonQualident o) {
     visitPsiElement(o);
   }
 
   public void visitRecordType(@NotNull OberonRecordType o) {
+    visitPsiElement(o);
+  }
+
+  public void visitRelation(@NotNull OberonRelation o) {
     visitPsiElement(o);
   }
 
@@ -111,15 +159,15 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitSet(@NotNull OberonSet o) {
+    visitPsiElement(o);
+  }
+
   public void visitSimpleExpression(@NotNull OberonSimpleExpression o) {
     visitPsiElement(o);
   }
 
   public void visitStatement(@NotNull OberonStatement o) {
-    visitPsiElement(o);
-  }
-
-  public void visitStatementSequence(@NotNull OberonStatementSequence o) {
     visitPsiElement(o);
   }
 
@@ -135,11 +183,11 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitTypeDeclarations(@NotNull OberonTypeDeclarations o) {
+  public void visitTypeDeclaration(@NotNull OberonTypeDeclaration o) {
     visitPsiElement(o);
   }
 
-  public void visitVarDeclarations(@NotNull OberonVarDeclarations o) {
+  public void visitVariableDeclaration(@NotNull OberonVariableDeclaration o) {
     visitPsiElement(o);
   }
 

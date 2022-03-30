@@ -27,10 +27,4 @@ public class OberonStringImpl extends ASTWrapperPsiElement implements OberonStri
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public PsiElement getStringLiteral() {
-    return findNotNullChildByType(STRING_LITERAL);
-  }
-
 }

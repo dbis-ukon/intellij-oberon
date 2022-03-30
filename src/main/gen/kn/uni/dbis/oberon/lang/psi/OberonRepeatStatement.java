@@ -11,6 +11,6 @@ public interface OberonRepeatStatement extends PsiElement {
   OberonExpression getExpression();
 
   @NotNull
-  OberonStatementSequence getStatementSequence();
+  List<OberonStatement> getStatementList();
 
 }

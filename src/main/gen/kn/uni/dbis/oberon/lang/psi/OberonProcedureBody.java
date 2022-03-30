@@ -8,9 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface OberonProcedureBody extends PsiElement {
 
   @NotNull
-  OberonDeclarations getDeclarations();
+  OberonDeclarationSequence getDeclarationSequence();
 
   @Nullable
-  OberonStatementSequence getStatementSequence();
+  OberonExpression getExpression();
+
+  @NotNull
+  List<OberonStatement> getStatementList();
 
 }

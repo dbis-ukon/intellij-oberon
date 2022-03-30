@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonTypeDeclarations extends PsiElement {
+public interface OberonProcedureType extends PsiElement {
 
-  @NotNull
-  List<OberonIdent> getIdentList();
-
-  @NotNull
-  List<OberonType> getTypeList();
+  @Nullable
+  OberonFormalParameters getFormalParameters();
 
 }

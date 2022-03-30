@@ -8,12 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface OberonAssignment extends PsiElement {
 
   @NotNull
+  OberonDesignator getDesignator();
+
+  @NotNull
   OberonExpression getExpression();
-
-  @NotNull
-  OberonIdent getIdent();
-
-  @NotNull
-  List<OberonSelector> getSelectorList();
 
 }

@@ -11,7 +11,7 @@ public interface OberonStatement extends PsiElement {
   OberonAssignment getAssignment();
 
   @Nullable
-  OberonExpression getExpression();
+  OberonCaseStatement getCaseStatement();
 
   @Nullable
   OberonForStatement getForStatement();

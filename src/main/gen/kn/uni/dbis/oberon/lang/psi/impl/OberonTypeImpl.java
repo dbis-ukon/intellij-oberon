@@ -35,14 +35,20 @@ public class OberonTypeImpl extends ASTWrapperPsiElement implements OberonType {
 
   @Override
   @Nullable
-  public OberonBuiltinType getBuiltinType() {
-    return findChildByClass(OberonBuiltinType.class);
+  public OberonPointerType getPointerType() {
+    return findChildByClass(OberonPointerType.class);
   }
 
   @Override
   @Nullable
-  public OberonIdent getIdent() {
-    return findChildByClass(OberonIdent.class);
+  public OberonProcedureType getProcedureType() {
+    return findChildByClass(OberonProcedureType.class);
+  }
+
+  @Override
+  @Nullable
+  public OberonQualident getQualident() {
+    return findChildByClass(OberonQualident.class);
   }
 
   @Override

@@ -29,8 +29,14 @@ public class OberonRecordTypeImpl extends ASTWrapperPsiElement implements Oberon
 
   @Override
   @NotNull
-  public List<OberonRecordField> getRecordFieldList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonRecordField.class);
+  public List<OberonFieldList> getFieldListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonFieldList.class);
+  }
+
+  @Override
+  @Nullable
+  public OberonQualident getQualident() {
+    return findChildByClass(OberonQualident.class);
   }
 
 }

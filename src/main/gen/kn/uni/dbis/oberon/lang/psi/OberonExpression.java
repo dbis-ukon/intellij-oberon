@@ -7,6 +7,9 @@ import com.intellij.psi.PsiElement;
 
 public interface OberonExpression extends PsiElement {
 
+  @Nullable
+  OberonRelation getRelation();
+
   @NotNull
   List<OberonSimpleExpression> getSimpleExpressionList();
 

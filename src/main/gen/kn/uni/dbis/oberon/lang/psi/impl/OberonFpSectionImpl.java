@@ -28,15 +28,15 @@ public class OberonFpSectionImpl extends ASTWrapperPsiElement implements OberonF
   }
 
   @Override
-  @Nullable
-  public OberonIdentList getIdentList() {
-    return findChildByClass(OberonIdentList.class);
+  @NotNull
+  public List<OberonIdent> getIdentList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonIdent.class);
   }
 
   @Override
   @Nullable
-  public OberonType getType() {
-    return findChildByClass(OberonType.class);
+  public OberonQualident getQualident() {
+    return findChildByClass(OberonQualident.class);
   }
 
 }

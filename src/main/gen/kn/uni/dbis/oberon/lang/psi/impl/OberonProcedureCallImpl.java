@@ -35,8 +35,8 @@ public class OberonProcedureCallImpl extends ASTWrapperPsiElement implements Obe
 
   @Override
   @NotNull
-  public OberonIdent getIdent() {
-    return findNotNullChildByClass(OberonIdent.class);
+  public OberonDesignator getDesignator() {
+    return findNotNullChildByClass(OberonDesignator.class);
   }
 
 }

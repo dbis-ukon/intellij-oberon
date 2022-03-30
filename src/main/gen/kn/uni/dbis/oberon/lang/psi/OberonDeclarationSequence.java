@@ -5,18 +5,18 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonDeclarations extends PsiElement {
+public interface OberonDeclarationSequence extends PsiElement {
 
-  @Nullable
-  OberonConstDeclarations getConstDeclarations();
+  @NotNull
+  List<OberonConstDeclaration> getConstDeclarationList();
 
   @NotNull
   List<OberonProcedureDeclaration> getProcedureDeclarationList();
 
-  @Nullable
-  OberonTypeDeclarations getTypeDeclarations();
+  @NotNull
+  List<OberonTypeDeclaration> getTypeDeclarationList();
 
-  @Nullable
-  OberonVarDeclarations getVarDeclarations();
+  @NotNull
+  List<OberonVariableDeclaration> getVariableDeclarationList();
 
 }

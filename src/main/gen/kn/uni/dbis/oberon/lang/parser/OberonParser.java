@@ -57,7 +57,20 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_ARRAY expression KW_OF type
+  // OP_PLUS | OP_MINUS | OP_OR
+  public static boolean and_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "and_operator")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, AND_OPERATOR, "<and operator>");
+    r = consumeToken(b, OP_PLUS);
+    if (!r) r = consumeToken(b, OP_MINUS);
+    if (!r) r = consumeToken(b, OP_OR);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // KW_ARRAY expression ( COMMAN expression )* KW_OF type
   public static boolean array_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "array_type")) return false;
     if (!nextTokenIs(b, KW_ARRAY)) return false;
@@ -65,57 +78,44 @@ public class OberonParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_ARRAY);
     r = r && expression(b, l + 1);
+    r = r && array_type_2(b, l + 1);
     r = r && consumeToken(b, KW_OF);
     r = r && type(b, l + 1);
     exit_section_(b, m, ARRAY_TYPE, r);
     return r;
   }
 
-  /* ********************************************************** */
-  // ident ( selector )* OP_BECOMES expression
-  public static boolean assignment(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = ident(b, l + 1);
-    r = r && assignment_1(b, l + 1);
-    r = r && consumeToken(b, OP_BECOMES);
-    r = r && expression(b, l + 1);
-    exit_section_(b, m, ASSIGNMENT, r);
-    return r;
-  }
-
-  // ( selector )*
-  private static boolean assignment_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_1")) return false;
+  // ( COMMAN expression )*
+  private static boolean array_type_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "array_type_2")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!assignment_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "assignment_1", c)) break;
+      if (!array_type_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "array_type_2", c)) break;
     }
     return true;
   }
 
-  // ( selector )
-  private static boolean assignment_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_1_0")) return false;
+  // COMMAN expression
+  private static boolean array_type_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "array_type_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = selector(b, l + 1);
+    r = consumeToken(b, COMMAN);
+    r = r && expression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // KW_FALSE | KW_TRUE
-  public static boolean boolean_$(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "boolean_$")) return false;
-    if (!nextTokenIs(b, "<boolean $>", KW_FALSE, KW_TRUE)) return false;
+  // designator OP_BECOMES expression
+  public static boolean assignment(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, BOOLEAN, "<boolean $>");
-    r = consumeToken(b, KW_FALSE);
-    if (!r) r = consumeToken(b, KW_TRUE);
+    Marker m = enter_section_(b, l, _NONE_, ASSIGNMENT, "<assignment>");
+    r = designator(b, l + 1);
+    r = r && consumeToken(b, OP_BECOMES);
+    r = r && expression(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -133,6 +133,56 @@ public class OberonParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, KW_BOOLEAN);
     if (!r) r = consumeToken(b, KW_STRING);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // [ <<comma_list label_range>> COLON <<semicolon_list statement>> ]
+  public static boolean case_$(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "case_$")) return false;
+    Marker m = enter_section_(b, l, _NONE_, CASE, "<case $>");
+    case_0(b, l + 1);
+    exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  // <<comma_list label_range>> COLON <<semicolon_list statement>>
+  private static boolean case_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "case_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = comma_list(b, l + 1, OberonParser::label_range);
+    r = r && consumeToken(b, COLON);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // KW_CASE expression KW_OF case ( PIPE case ) KW_END
+  public static boolean case_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "case_statement")) return false;
+    if (!nextTokenIs(b, KW_CASE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_CASE);
+    r = r && expression(b, l + 1);
+    r = r && consumeToken(b, KW_OF);
+    r = r && case_$(b, l + 1);
+    r = r && case_statement_4(b, l + 1);
+    r = r && consumeToken(b, KW_END);
+    exit_section_(b, m, CASE_STATEMENT, r);
+    return r;
+  }
+
+  // PIPE case
+  private static boolean case_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "case_statement_4")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, PIPE);
+    r = r && case_$(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -171,104 +221,242 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_CONST ( ident OP_EQ expression SEMICOLON )+
-  public static boolean const_declarations(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "const_declarations")) return false;
-    if (!nextTokenIs(b, KW_CONST)) return false;
+  // identdef OP_EQ expression
+  public static boolean const_declaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "const_declaration")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, KW_CONST);
-    r = r && const_declarations_1(b, l + 1);
-    exit_section_(b, m, CONST_DECLARATIONS, r);
+    Marker m = enter_section_(b, l, _NONE_, CONST_DECLARATION, "<const declaration>");
+    r = identdef(b, l + 1);
+    r = r && consumeToken(b, OP_EQ);
+    r = r && expression(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // ( ident OP_EQ expression SEMICOLON )+
-  private static boolean const_declarations_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "const_declarations_1")) return false;
+  /* ********************************************************** */
+  // [ KW_CONST ( const_declaration SEMICOLON )* ]
+  //                          [ KW_TYPE ( type_declaration SEMICOLON )* ]
+  //                          [ KW_VAR ( variable_declaration SEMICOLON )* ]
+  //                          ( procedure_declaration SEMICOLON )*
+  public static boolean declaration_sequence(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, DECLARATION_SEQUENCE, "<declaration sequence>");
+    r = declaration_sequence_0(b, l + 1);
+    r = r && declaration_sequence_1(b, l + 1);
+    r = r && declaration_sequence_2(b, l + 1);
+    r = r && declaration_sequence_3(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [ KW_CONST ( const_declaration SEMICOLON )* ]
+  private static boolean declaration_sequence_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_0")) return false;
+    declaration_sequence_0_0(b, l + 1);
+    return true;
+  }
+
+  // KW_CONST ( const_declaration SEMICOLON )*
+  private static boolean declaration_sequence_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = const_declarations_1_0(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!const_declarations_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "const_declarations_1", c)) break;
-    }
+    r = consumeToken(b, KW_CONST);
+    r = r && declaration_sequence_0_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // ident OP_EQ expression SEMICOLON
-  private static boolean const_declarations_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "const_declarations_1_0")) return false;
+  // ( const_declaration SEMICOLON )*
+  private static boolean declaration_sequence_0_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_0_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!declaration_sequence_0_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "declaration_sequence_0_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // const_declaration SEMICOLON
+  private static boolean declaration_sequence_0_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_0_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ident(b, l + 1);
-    r = r && consumeToken(b, OP_EQ);
-    r = r && expression(b, l + 1);
+    r = const_declaration(b, l + 1);
+    r = r && consumeToken(b, SEMICOLON);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // [ KW_TYPE ( type_declaration SEMICOLON )* ]
+  private static boolean declaration_sequence_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_1")) return false;
+    declaration_sequence_1_0(b, l + 1);
+    return true;
+  }
+
+  // KW_TYPE ( type_declaration SEMICOLON )*
+  private static boolean declaration_sequence_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_TYPE);
+    r = r && declaration_sequence_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // ( type_declaration SEMICOLON )*
+  private static boolean declaration_sequence_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_1_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!declaration_sequence_1_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "declaration_sequence_1_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // type_declaration SEMICOLON
+  private static boolean declaration_sequence_1_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_1_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = type_declaration(b, l + 1);
+    r = r && consumeToken(b, SEMICOLON);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // [ KW_VAR ( variable_declaration SEMICOLON )* ]
+  private static boolean declaration_sequence_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_2")) return false;
+    declaration_sequence_2_0(b, l + 1);
+    return true;
+  }
+
+  // KW_VAR ( variable_declaration SEMICOLON )*
+  private static boolean declaration_sequence_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_VAR);
+    r = r && declaration_sequence_2_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // ( variable_declaration SEMICOLON )*
+  private static boolean declaration_sequence_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_2_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!declaration_sequence_2_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "declaration_sequence_2_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // variable_declaration SEMICOLON
+  private static boolean declaration_sequence_2_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_2_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = variable_declaration(b, l + 1);
+    r = r && consumeToken(b, SEMICOLON);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // ( procedure_declaration SEMICOLON )*
+  private static boolean declaration_sequence_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_3")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!declaration_sequence_3_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "declaration_sequence_3", c)) break;
+    }
+    return true;
+  }
+
+  // procedure_declaration SEMICOLON
+  private static boolean declaration_sequence_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "declaration_sequence_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = procedure_declaration(b, l + 1);
     r = r && consumeToken(b, SEMICOLON);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // [ const_declarations ] [ type_declarations ] [ var_declarations ] ( procedure_declaration )*
-  public static boolean declarations(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "declarations")) return false;
+  // qualident ( selector )*
+  public static boolean designator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "designator")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, DECLARATIONS, "<declarations>");
-    r = declarations_0(b, l + 1);
-    r = r && declarations_1(b, l + 1);
-    r = r && declarations_2(b, l + 1);
-    r = r && declarations_3(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, DESIGNATOR, "<designator>");
+    r = qualident(b, l + 1);
+    r = r && designator_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // [ const_declarations ]
-  private static boolean declarations_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "declarations_0")) return false;
-    const_declarations(b, l + 1);
-    return true;
-  }
-
-  // [ type_declarations ]
-  private static boolean declarations_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "declarations_1")) return false;
-    type_declarations(b, l + 1);
-    return true;
-  }
-
-  // [ var_declarations ]
-  private static boolean declarations_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "declarations_2")) return false;
-    var_declarations(b, l + 1);
-    return true;
-  }
-
-  // ( procedure_declaration )*
-  private static boolean declarations_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "declarations_3")) return false;
+  // ( selector )*
+  private static boolean designator_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "designator_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!declarations_3_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "declarations_3", c)) break;
+      if (!designator_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "designator_1", c)) break;
     }
     return true;
   }
 
-  // ( procedure_declaration )
-  private static boolean declarations_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "declarations_3_0")) return false;
+  // ( selector )
+  private static boolean designator_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "designator_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = procedure_declaration(b, l + 1);
+    r = selector(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // simple_expression [ ( OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ ) simple_expression ]
+  // expression [ RANGE expression ]
+  public static boolean element(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "element")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, ELEMENT, "<element>");
+    r = expression(b, l + 1);
+    r = r && element_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [ RANGE expression ]
+  private static boolean element_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "element_1")) return false;
+    element_1_0(b, l + 1);
+    return true;
+  }
+
+  // RANGE expression
+  private static boolean element_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "element_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, RANGE);
+    r = r && expression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // simple_expression [ relation simple_expression ]
   public static boolean expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expression")) return false;
     boolean r;
@@ -279,98 +467,65 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [ ( OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ ) simple_expression ]
+  // [ relation simple_expression ]
   private static boolean expression_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expression_1")) return false;
     expression_1_0(b, l + 1);
     return true;
   }
 
-  // ( OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ ) simple_expression
+  // relation simple_expression
   private static boolean expression_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expression_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = expression_1_0_0(b, l + 1);
+    r = relation(b, l + 1);
     r = r && simple_expression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ
-  private static boolean expression_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expression_1_0_0")) return false;
-    boolean r;
-    r = consumeToken(b, OP_EQ);
-    if (!r) r = consumeToken(b, OP_NEQ);
-    if (!r) r = consumeToken(b, OP_LT);
-    if (!r) r = consumeToken(b, OP_LEQ);
-    if (!r) r = consumeToken(b, OP_GT);
-    if (!r) r = consumeToken(b, OP_GEQ);
-    return r;
-  }
-
   /* ********************************************************** */
-  // ident [ actual_parameters ] ( selector )*  |
-  //              integer | real | boolean | string | LPAREN expression RPAREN | OP_NOT factor
+  // number | string | KW_NIL | KW_TRUE | KW_FALSE | set | designator [ actual_parameters ] |
+  //            LPAREN expression RPAREN | OP_NOT factor
   public static boolean factor(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "factor")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, FACTOR, "<factor>");
-    r = factor_0(b, l + 1);
-    if (!r) r = integer(b, l + 1);
-    if (!r) r = real(b, l + 1);
-    if (!r) r = boolean_$(b, l + 1);
+    r = number(b, l + 1);
     if (!r) r = string(b, l + 1);
-    if (!r) r = factor_5(b, l + 1);
+    if (!r) r = consumeToken(b, KW_NIL);
+    if (!r) r = consumeToken(b, KW_TRUE);
+    if (!r) r = consumeToken(b, KW_FALSE);
+    if (!r) r = set(b, l + 1);
     if (!r) r = factor_6(b, l + 1);
+    if (!r) r = factor_7(b, l + 1);
+    if (!r) r = factor_8(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // ident [ actual_parameters ] ( selector )*
-  private static boolean factor_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "factor_0")) return false;
+  // designator [ actual_parameters ]
+  private static boolean factor_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "factor_6")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ident(b, l + 1);
-    r = r && factor_0_1(b, l + 1);
-    r = r && factor_0_2(b, l + 1);
+    r = designator(b, l + 1);
+    r = r && factor_6_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // [ actual_parameters ]
-  private static boolean factor_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "factor_0_1")) return false;
+  private static boolean factor_6_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "factor_6_1")) return false;
     actual_parameters(b, l + 1);
     return true;
   }
 
-  // ( selector )*
-  private static boolean factor_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "factor_0_2")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!factor_0_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "factor_0_2", c)) break;
-    }
-    return true;
-  }
-
-  // ( selector )
-  private static boolean factor_0_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "factor_0_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = selector(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   // LPAREN expression RPAREN
-  private static boolean factor_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "factor_5")) return false;
+  private static boolean factor_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "factor_7")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, LPAREN);
@@ -381,8 +536,8 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   // OP_NOT factor
-  private static boolean factor_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "factor_6")) return false;
+  private static boolean factor_8(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "factor_8")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, OP_NOT);
@@ -392,7 +547,20 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO statement_sequence KW_END
+  // <<comma_list identdef>> COLON type
+  public static boolean field_list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "field_list")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, FIELD_LIST, "<field list>");
+    r = comma_list(b, l + 1, OberonParser::identdef);
+    r = r && consumeToken(b, COLON);
+    r = r && type(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO <<semicolon_list statement>> KW_END
   public static boolean for_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "for_statement")) return false;
     if (!nextTokenIs(b, KW_FOR)) return false;
@@ -406,7 +574,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
     r = r && expression(b, l + 1);
     r = r && for_statement_6(b, l + 1);
     r = r && consumeToken(b, KW_DO);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
     r = r && consumeToken(b, KW_END);
     exit_section_(b, m, FOR_STATEMENT, r);
     return r;
@@ -431,7 +599,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LPAREN [ <<semicolon_list fp_section>> ] RPAREN
+  // LPAREN [ <<semicolon_list fp_section>> ] RPAREN [ COLON qualident ]
   public static boolean formal_parameters(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "formal_parameters")) return false;
     if (!nextTokenIs(b, LPAREN)) return false;
@@ -440,6 +608,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, LPAREN);
     r = r && formal_parameters_1(b, l + 1);
     r = r && consumeToken(b, RPAREN);
+    r = r && formal_parameters_3(b, l + 1);
     exit_section_(b, m, FORMAL_PARAMETERS, r);
     return r;
   }
@@ -451,8 +620,26 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  // [ COLON qualident ]
+  private static boolean formal_parameters_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "formal_parameters_3")) return false;
+    formal_parameters_3_0(b, l + 1);
+    return true;
+  }
+
+  // COLON qualident
+  private static boolean formal_parameters_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "formal_parameters_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COLON);
+    r = r && qualident(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
   /* ********************************************************** */
-  // [ "VAR" ] ident_list COLON type | VARARGS
+  // [ KW_VAR ] <<comma_list ident>> COLON [ KW_ARRAY KW_OF ] qualident | VARARGS
   public static boolean fp_section(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fp_section")) return false;
     boolean r;
@@ -463,54 +650,69 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [ "VAR" ] ident_list COLON type
+  // [ KW_VAR ] <<comma_list ident>> COLON [ KW_ARRAY KW_OF ] qualident
   private static boolean fp_section_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fp_section_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = fp_section_0_0(b, l + 1);
-    r = r && ident_list(b, l + 1);
+    r = r && comma_list(b, l + 1, OberonParser::ident);
     r = r && consumeToken(b, COLON);
-    r = r && type(b, l + 1);
+    r = r && fp_section_0_3(b, l + 1);
+    r = r && qualident(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // [ "VAR" ]
+  // [ KW_VAR ]
   private static boolean fp_section_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fp_section_0_0")) return false;
     consumeToken(b, KW_VAR);
     return true;
   }
 
+  // [ KW_ARRAY KW_OF ]
+  private static boolean fp_section_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fp_section_0_3")) return false;
+    parseTokens(b, 0, KW_ARRAY, KW_OF);
+    return true;
+  }
+
   /* ********************************************************** */
-  // IDENTIFIER
+  // IDENTIFIER | builtin_type
   public static boolean ident(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ident")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, IDENT, "<ident>");
     r = consumeToken(b, IDENTIFIER);
-    exit_section_(b, m, IDENT, r);
+    if (!r) r = builtin_type(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // <<comma_list ident>>
-  public static boolean ident_list(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ident_list")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+  // ident [ OP_TIMES ]
+  public static boolean identdef(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "identdef")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = comma_list(b, l + 1, OberonParser::ident);
-    exit_section_(b, m, IDENT_LIST, r);
+    Marker m = enter_section_(b, l, _NONE_, IDENTDEF, "<identdef>");
+    r = ident(b, l + 1);
+    r = r && identdef_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
+  // [ OP_TIMES ]
+  private static boolean identdef_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "identdef_1")) return false;
+    consumeToken(b, OP_TIMES);
+    return true;
+  }
+
   /* ********************************************************** */
-  // KW_IF expression KW_THEN statement_sequence
-  //                  { KW_ELSIF expression KW_THEN statement_sequence }
-  //                  [ KW_ELSE statement_sequence ] KW_END
+  // KW_IF expression KW_THEN <<semicolon_list statement>>
+  //                  ( KW_ELSIF expression KW_THEN <<semicolon_list statement>> )*
+  //                  [ KW_ELSE <<semicolon_list statement>> ] KW_END
   public static boolean if_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "if_statement")) return false;
     if (!nextTokenIs(b, KW_IF)) return false;
@@ -519,7 +721,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, KW_IF);
     r = r && expression(b, l + 1);
     r = r && consumeToken(b, KW_THEN);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
     r = r && if_statement_4(b, l + 1);
     r = r && if_statement_5(b, l + 1);
     r = r && consumeToken(b, KW_END);
@@ -527,65 +729,151 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // KW_ELSIF expression KW_THEN statement_sequence
+  // ( KW_ELSIF expression KW_THEN <<semicolon_list statement>> )*
   private static boolean if_statement_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "if_statement_4")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!if_statement_4_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "if_statement_4", c)) break;
+    }
+    return true;
+  }
+
+  // KW_ELSIF expression KW_THEN <<semicolon_list statement>>
+  private static boolean if_statement_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "if_statement_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_ELSIF);
     r = r && expression(b, l + 1);
     r = r && consumeToken(b, KW_THEN);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // [ KW_ELSE statement_sequence ]
+  // [ KW_ELSE <<semicolon_list statement>> ]
   private static boolean if_statement_5(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "if_statement_5")) return false;
     if_statement_5_0(b, l + 1);
     return true;
   }
 
-  // KW_ELSE statement_sequence
+  // KW_ELSE <<semicolon_list statement>>
   private static boolean if_statement_5_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "if_statement_5_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_ELSE);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // INTEGER_LITERAL
-  public static boolean integer(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "integer")) return false;
-    if (!nextTokenIs(b, INTEGER_LITERAL)) return false;
+  // ident [ OP_BECOMES ident ]
+  public static boolean import_$(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "import_$")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, IMPORT, "<import $>");
+    r = ident(b, l + 1);
+    r = r && import_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [ OP_BECOMES ident ]
+  private static boolean import_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "import_1")) return false;
+    import_1_0(b, l + 1);
+    return true;
+  }
+
+  // OP_BECOMES ident
+  private static boolean import_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "import_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, INTEGER_LITERAL);
-    exit_section_(b, m, INTEGER, r);
+    r = consumeToken(b, OP_BECOMES);
+    r = r && ident(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // KW_LOOP statement_sequence KW_END
-  public static boolean loop_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "loop_statement")) return false;
-    if (!nextTokenIs(b, KW_LOOP)) return false;
+  // KW_IMPORT <<comma_list import>> SEMICOLON
+  public static boolean import_list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "import_list")) return false;
+    if (!nextTokenIs(b, KW_IMPORT)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, KW_LOOP);
-    r = r && statement_sequence(b, l + 1);
+    r = consumeToken(b, KW_IMPORT);
+    r = r && comma_list(b, l + 1, OberonParser::import_$);
+    r = r && consumeToken(b, SEMICOLON);
+    exit_section_(b, m, IMPORT_LIST, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // integer | string | qualident
+  public static boolean label(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "label")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, LABEL, "<label>");
+    r = consumeToken(b, INTEGER);
+    if (!r) r = string(b, l + 1);
+    if (!r) r = qualident(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // label [ RANGE label ]
+  public static boolean label_range(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "label_range")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, LABEL_RANGE, "<label range>");
+    r = label(b, l + 1);
+    r = r && label_range_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [ RANGE label ]
+  private static boolean label_range_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "label_range_1")) return false;
+    label_range_1_0(b, l + 1);
+    return true;
+  }
+
+  // RANGE label
+  private static boolean label_range_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "label_range_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, RANGE);
+    r = r && label(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // LW_LOOP <<semicolon_list statement>> KW_END
+  public static boolean loop_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "loop_statement")) return false;
+    if (!nextTokenIs(b, LW_LOOP)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LW_LOOP);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
     r = r && consumeToken(b, KW_END);
     exit_section_(b, m, LOOP_STATEMENT, r);
     return r;
   }
 
   /* ********************************************************** */
-  // KW_MODULE ident SEMICOLON declarations [ KW_BEGIN statement_sequence ] KW_END ident PERIOD
+  // KW_MODULE ident SEMICOLON [ import_list ] declaration_sequence [ KW_BEGIN <<semicolon_list statement>> ] KW_END ident PERIOD
   static boolean module(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "module")) return false;
     if (!nextTokenIs(b, KW_MODULE)) return false;
@@ -594,8 +882,9 @@ public class OberonParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, KW_MODULE);
     r = r && ident(b, l + 1);
     r = r && consumeToken(b, SEMICOLON);
-    r = r && declarations(b, l + 1);
-    r = r && module_4(b, l + 1);
+    r = r && module_3(b, l + 1);
+    r = r && declaration_sequence(b, l + 1);
+    r = r && module_5(b, l + 1);
     r = r && consumeToken(b, KW_END);
     r = r && ident(b, l + 1);
     r = r && consumeToken(b, PERIOD);
@@ -603,65 +892,131 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [ KW_BEGIN statement_sequence ]
-  private static boolean module_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "module_4")) return false;
-    module_4_0(b, l + 1);
+  // [ import_list ]
+  private static boolean module_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "module_3")) return false;
+    import_list(b, l + 1);
     return true;
   }
 
-  // KW_BEGIN statement_sequence
-  private static boolean module_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "module_4_0")) return false;
+  // [ KW_BEGIN <<semicolon_list statement>> ]
+  private static boolean module_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "module_5")) return false;
+    module_5_0(b, l + 1);
+    return true;
+  }
+
+  // KW_BEGIN <<semicolon_list statement>>
+  private static boolean module_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "module_5_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_BEGIN);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // declarations [ KW_BEGIN statement_sequence ] KW_END
+  // OP_TIMES | OP_DIVIDE | OP_DIV | OP_MOD | OP_AND
+  public static boolean mult_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mult_operator")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, MULT_OPERATOR, "<mult operator>");
+    r = consumeToken(b, OP_TIMES);
+    if (!r) r = consumeToken(b, OP_DIVIDE);
+    if (!r) r = consumeToken(b, OP_DIV);
+    if (!r) r = consumeToken(b, OP_MOD);
+    if (!r) r = consumeToken(b, OP_AND);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // INTEGER_LITERAL | REAL_LITERAL
+  public static boolean number(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "number")) return false;
+    if (!nextTokenIs(b, "<number>", INTEGER_LITERAL, REAL_LITERAL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, NUMBER, "<number>");
+    r = consumeToken(b, INTEGER_LITERAL);
+    if (!r) r = consumeToken(b, REAL_LITERAL);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // KW_POINTER KW_TO type
+  public static boolean pointer_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pointer_type")) return false;
+    if (!nextTokenIs(b, KW_POINTER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, KW_POINTER, KW_TO);
+    r = r && type(b, l + 1);
+    exit_section_(b, m, POINTER_TYPE, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // declaration_sequence [ KW_BEGIN <<semicolon_list statement>> ] [ KW_RETURN expression ] KW_END
   public static boolean procedure_body(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "procedure_body")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PROCEDURE_BODY, "<procedure body>");
-    r = declarations(b, l + 1);
+    r = declaration_sequence(b, l + 1);
     r = r && procedure_body_1(b, l + 1);
+    r = r && procedure_body_2(b, l + 1);
     r = r && consumeToken(b, KW_END);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // [ KW_BEGIN statement_sequence ]
+  // [ KW_BEGIN <<semicolon_list statement>> ]
   private static boolean procedure_body_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "procedure_body_1")) return false;
     procedure_body_1_0(b, l + 1);
     return true;
   }
 
-  // KW_BEGIN statement_sequence
+  // KW_BEGIN <<semicolon_list statement>>
   private static boolean procedure_body_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "procedure_body_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_BEGIN);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // [ KW_RETURN expression ]
+  private static boolean procedure_body_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "procedure_body_2")) return false;
+    procedure_body_2_0(b, l + 1);
+    return true;
+  }
+
+  // KW_RETURN expression
+  private static boolean procedure_body_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "procedure_body_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_RETURN);
+    r = r && expression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // ident [ actual_parameters ]
+  // designator [ actual_parameters ]
   public static boolean procedure_call(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "procedure_call")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = ident(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, PROCEDURE_CALL, "<procedure call>");
+    r = designator(b, l + 1);
     r = r && procedure_call_1(b, l + 1);
-    exit_section_(b, m, PROCEDURE_CALL, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -673,7 +1028,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // procedure_heading SEMICOLON ( procedure_body ident | KW_EXTERN ) SEMICOLON
+  // procedure_heading SEMICOLON ( procedure_body ident | KW_EXTERN )
   public static boolean procedure_declaration(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "procedure_declaration")) return false;
     if (!nextTokenIs(b, KW_PROCEDURE)) return false;
@@ -682,7 +1037,6 @@ public class OberonParser implements PsiParser, LightPsiParser {
     r = procedure_heading(b, l + 1);
     r = r && consumeToken(b, SEMICOLON);
     r = r && procedure_declaration_2(b, l + 1);
-    r = r && consumeToken(b, SEMICOLON);
     exit_section_(b, m, PROCEDURE_DECLARATION, r);
     return r;
   }
@@ -710,16 +1064,15 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // KW_PROCEDURE ident [ formal_parameters ] [ COLON type ]
+  // KW_PROCEDURE identdef [ formal_parameters ]
   public static boolean procedure_heading(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "procedure_heading")) return false;
     if (!nextTokenIs(b, KW_PROCEDURE)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_PROCEDURE);
-    r = r && ident(b, l + 1);
+    r = r && identdef(b, l + 1);
     r = r && procedure_heading_2(b, l + 1);
-    r = r && procedure_heading_3(b, l + 1);
     exit_section_(b, m, PROCEDURE_HEADING, r);
     return r;
   }
@@ -731,73 +1084,124 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // [ COLON type ]
-  private static boolean procedure_heading_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "procedure_heading_3")) return false;
-    procedure_heading_3_0(b, l + 1);
+  /* ********************************************************** */
+  // KW_PROCEDURE [ formal_parameters ]
+  public static boolean procedure_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "procedure_type")) return false;
+    if (!nextTokenIs(b, KW_PROCEDURE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_PROCEDURE);
+    r = r && procedure_type_1(b, l + 1);
+    exit_section_(b, m, PROCEDURE_TYPE, r);
+    return r;
+  }
+
+  // [ formal_parameters ]
+  private static boolean procedure_type_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "procedure_type_1")) return false;
+    formal_parameters(b, l + 1);
     return true;
   }
 
-  // COLON type
-  private static boolean procedure_heading_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "procedure_heading_3_0")) return false;
+  /* ********************************************************** */
+  // [ ident PERIOD ] ident
+  public static boolean qualident(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "qualident")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, QUALIDENT, "<qualident>");
+    r = qualident_0(b, l + 1);
+    r = r && ident(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // [ ident PERIOD ]
+  private static boolean qualident_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "qualident_0")) return false;
+    qualident_0_0(b, l + 1);
+    return true;
+  }
+
+  // ident PERIOD
+  private static boolean qualident_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "qualident_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, COLON);
-    r = r && type(b, l + 1);
+    r = ident(b, l + 1);
+    r = r && consumeToken(b, PERIOD);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // REAL_LITERAL
-  public static boolean real(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "real")) return false;
-    if (!nextTokenIs(b, REAL_LITERAL)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, REAL_LITERAL);
-    exit_section_(b, m, REAL, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // ident_list COLON type
-  public static boolean record_field(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "record_field")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = ident_list(b, l + 1);
-    r = r && consumeToken(b, COLON);
-    r = r && type(b, l + 1);
-    exit_section_(b, m, RECORD_FIELD, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // KW_RECORD <<semicolon_list record_field>> KW_END
+  // KW_RECORD [ LPAREN qualident RPAREN ] [ <<semicolon_list field_list>> ] KW_END
   public static boolean record_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "record_type")) return false;
     if (!nextTokenIs(b, KW_RECORD)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_RECORD);
-    r = r && semicolon_list(b, l + 1, OberonParser::record_field);
+    r = r && record_type_1(b, l + 1);
+    r = r && record_type_2(b, l + 1);
     r = r && consumeToken(b, KW_END);
     exit_section_(b, m, RECORD_TYPE, r);
     return r;
   }
 
+  // [ LPAREN qualident RPAREN ]
+  private static boolean record_type_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "record_type_1")) return false;
+    record_type_1_0(b, l + 1);
+    return true;
+  }
+
+  // LPAREN qualident RPAREN
+  private static boolean record_type_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "record_type_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LPAREN);
+    r = r && qualident(b, l + 1);
+    r = r && consumeToken(b, RPAREN);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // [ <<semicolon_list field_list>> ]
+  private static boolean record_type_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "record_type_2")) return false;
+    semicolon_list(b, l + 1, OberonParser::field_list);
+    return true;
+  }
+
   /* ********************************************************** */
-  // KW_REPEAT statement_sequence KW_UNTIL expression
+  // OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ | OP_IN | OP_IS
+  public static boolean relation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relation")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, RELATION, "<relation>");
+    r = consumeToken(b, OP_EQ);
+    if (!r) r = consumeToken(b, OP_NEQ);
+    if (!r) r = consumeToken(b, OP_LT);
+    if (!r) r = consumeToken(b, OP_LEQ);
+    if (!r) r = consumeToken(b, OP_GT);
+    if (!r) r = consumeToken(b, OP_GEQ);
+    if (!r) r = consumeToken(b, OP_IN);
+    if (!r) r = consumeToken(b, OP_IS);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // KW_REPEAT <<semicolon_list statement>> KW_UNTIL expression
   public static boolean repeat_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "repeat_statement")) return false;
     if (!nextTokenIs(b, KW_REPEAT)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, KW_REPEAT);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
     r = r && consumeToken(b, KW_UNTIL);
     r = r && expression(b, l + 1);
     exit_section_(b, m, REPEAT_STATEMENT, r);
@@ -805,14 +1209,15 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // PERIOD ident | LBRACK expression RBRACK
+  // PERIOD ident | LBRACK <<comma_list expression>> RBRACK | OP_DEREF | LPAREN qualident RPAREN
   public static boolean selector(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "selector")) return false;
-    if (!nextTokenIs(b, "<selector>", LBRACK, PERIOD)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SELECTOR, "<selector>");
     r = selector_0(b, l + 1);
     if (!r) r = selector_1(b, l + 1);
+    if (!r) r = consumeToken(b, OP_DEREF);
+    if (!r) r = selector_3(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -828,14 +1233,26 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // LBRACK expression RBRACK
+  // LBRACK <<comma_list expression>> RBRACK
   private static boolean selector_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "selector_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, LBRACK);
-    r = r && expression(b, l + 1);
+    r = r && comma_list(b, l + 1, OberonParser::expression);
     r = r && consumeToken(b, RBRACK);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // LPAREN qualident RPAREN
+  private static boolean selector_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "selector_3")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LPAREN);
+    r = r && qualident(b, l + 1);
+    r = r && consumeToken(b, RPAREN);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -875,7 +1292,28 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // [ OP_PLUS | OP_MINUS ] term ( ( OP_PLUS | OP_MINUS | OP_OR ) term )*
+  // LBRACE [ <<comma_list element>> ] RBRACE
+  public static boolean set(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set")) return false;
+    if (!nextTokenIs(b, LBRACE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LBRACE);
+    r = r && set_1(b, l + 1);
+    r = r && consumeToken(b, RBRACE);
+    exit_section_(b, m, SET, r);
+    return r;
+  }
+
+  // [ <<comma_list element>> ]
+  private static boolean set_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "set_1")) return false;
+    comma_list(b, l + 1, OberonParser::element);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // [ OP_PLUS | OP_MINUS ] term ( and_operator term )*
   public static boolean simple_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "simple_expression")) return false;
     boolean r;
@@ -903,7 +1341,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // ( ( OP_PLUS | OP_MINUS | OP_OR ) term )*
+  // ( and_operator term )*
   private static boolean simple_expression_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "simple_expression_2")) return false;
     while (true) {
@@ -914,74 +1352,44 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ( OP_PLUS | OP_MINUS | OP_OR ) term
+  // and_operator term
   private static boolean simple_expression_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "simple_expression_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = simple_expression_2_0_0(b, l + 1);
+    r = and_operator(b, l + 1);
     r = r && term(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // OP_PLUS | OP_MINUS | OP_OR
-  private static boolean simple_expression_2_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "simple_expression_2_0_0")) return false;
-    boolean r;
-    r = consumeToken(b, OP_PLUS);
-    if (!r) r = consumeToken(b, OP_MINUS);
-    if (!r) r = consumeToken(b, OP_OR);
-    return r;
-  }
-
   /* ********************************************************** */
-  // assignment | procedure_call | if_statement | /* case_statement | */
+  // [ assignment | procedure_call | if_statement | case_statement |
   //                 while_statement | repeat_statement | for_statement | loop_statement |
-  //                 /* with_statement | */ KW_EXIT | KW_RETURN [ expression ]
+  //                 /* with_statement | */ KW_EXIT ]
   public static boolean statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "statement")) return false;
-    boolean r;
     Marker m = enter_section_(b, l, _NONE_, STATEMENT, "<statement>");
+    statement_0(b, l + 1);
+    exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  // assignment | procedure_call | if_statement | case_statement |
+  //                 while_statement | repeat_statement | for_statement | loop_statement |
+  //                 /* with_statement | */ KW_EXIT
+  private static boolean statement_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "statement_0")) return false;
+    boolean r;
     r = assignment(b, l + 1);
     if (!r) r = procedure_call(b, l + 1);
     if (!r) r = if_statement(b, l + 1);
+    if (!r) r = case_statement(b, l + 1);
     if (!r) r = while_statement(b, l + 1);
     if (!r) r = repeat_statement(b, l + 1);
     if (!r) r = for_statement(b, l + 1);
     if (!r) r = loop_statement(b, l + 1);
     if (!r) r = consumeToken(b, KW_EXIT);
-    if (!r) r = statement_8(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // KW_RETURN [ expression ]
-  private static boolean statement_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "statement_8")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, KW_RETURN);
-    r = r && statement_8_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // [ expression ]
-  private static boolean statement_8_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "statement_8_1")) return false;
-    expression(b, l + 1);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // <<semicolon_list statement>>
-  public static boolean statement_sequence(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "statement_sequence")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, STATEMENT_SEQUENCE, "<statement sequence>");
-    r = semicolon_list(b, l + 1, OberonParser::statement);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -998,7 +1406,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // factor ( ( OP_TIMES | OP_DIV | OP_MOD | OP_AND ) factor )*
+  // factor ( mult_operator factor )*
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
@@ -1009,7 +1417,7 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // ( ( OP_TIMES | OP_DIV | OP_MOD | OP_AND ) factor )*
+  // ( mult_operator factor )*
   private static boolean term_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term_1")) return false;
     while (true) {
@@ -1020,126 +1428,62 @@ public class OberonParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ( OP_TIMES | OP_DIV | OP_MOD | OP_AND ) factor
+  // mult_operator factor
   private static boolean term_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = term_1_0_0(b, l + 1);
+    r = mult_operator(b, l + 1);
     r = r && factor(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // OP_TIMES | OP_DIV | OP_MOD | OP_AND
-  private static boolean term_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "term_1_0_0")) return false;
-    boolean r;
-    r = consumeToken(b, OP_TIMES);
-    if (!r) r = consumeToken(b, OP_DIV);
-    if (!r) r = consumeToken(b, OP_MOD);
-    if (!r) r = consumeToken(b, OP_AND);
-    return r;
-  }
-
   /* ********************************************************** */
-  // ident | array_type | record_type | builtin_type
+  // qualident | array_type | record_type | pointer_type | procedure_type
   public static boolean type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE, "<type>");
-    r = ident(b, l + 1);
+    r = qualident(b, l + 1);
     if (!r) r = array_type(b, l + 1);
     if (!r) r = record_type(b, l + 1);
-    if (!r) r = builtin_type(b, l + 1);
+    if (!r) r = pointer_type(b, l + 1);
+    if (!r) r = procedure_type(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // KW_TYPE ( ident OP_EQ type SEMICOLON )+
-  public static boolean type_declarations(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "type_declarations")) return false;
-    if (!nextTokenIs(b, KW_TYPE)) return false;
+  // identdef OP_EQ type
+  public static boolean type_declaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_declaration")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, KW_TYPE);
-    r = r && type_declarations_1(b, l + 1);
-    exit_section_(b, m, TYPE_DECLARATIONS, r);
-    return r;
-  }
-
-  // ( ident OP_EQ type SEMICOLON )+
-  private static boolean type_declarations_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "type_declarations_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = type_declarations_1_0(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!type_declarations_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "type_declarations_1", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ident OP_EQ type SEMICOLON
-  private static boolean type_declarations_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "type_declarations_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = ident(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, TYPE_DECLARATION, "<type declaration>");
+    r = identdef(b, l + 1);
     r = r && consumeToken(b, OP_EQ);
     r = r && type(b, l + 1);
-    r = r && consumeToken(b, SEMICOLON);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // KW_VAR ( ident_list COLON type SEMICOLON )+
-  public static boolean var_declarations(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "var_declarations")) return false;
-    if (!nextTokenIs(b, KW_VAR)) return false;
+  // <<comma_list identdef>> COLON type
+  public static boolean variable_declaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "variable_declaration")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, KW_VAR);
-    r = r && var_declarations_1(b, l + 1);
-    exit_section_(b, m, VAR_DECLARATIONS, r);
-    return r;
-  }
-
-  // ( ident_list COLON type SEMICOLON )+
-  private static boolean var_declarations_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "var_declarations_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = var_declarations_1_0(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!var_declarations_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "var_declarations_1", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ident_list COLON type SEMICOLON
-  private static boolean var_declarations_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "var_declarations_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = ident_list(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, VARIABLE_DECLARATION, "<variable declaration>");
+    r = comma_list(b, l + 1, OberonParser::identdef);
     r = r && consumeToken(b, COLON);
     r = r && type(b, l + 1);
-    r = r && consumeToken(b, SEMICOLON);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // KW_WHILE expression KW_DO statement_sequence KW_END
+  // KW_WHILE expression KW_DO <<semicolon_list statement>>
+  //                     ( KW_ELSIF expression KW_DO <<semicolon_list statement>> )*
+  //                     KW_END
   public static boolean while_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "while_statement")) return false;
     if (!nextTokenIs(b, KW_WHILE)) return false;
@@ -1148,9 +1492,34 @@ public class OberonParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, KW_WHILE);
     r = r && expression(b, l + 1);
     r = r && consumeToken(b, KW_DO);
-    r = r && statement_sequence(b, l + 1);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
+    r = r && while_statement_4(b, l + 1);
     r = r && consumeToken(b, KW_END);
     exit_section_(b, m, WHILE_STATEMENT, r);
+    return r;
+  }
+
+  // ( KW_ELSIF expression KW_DO <<semicolon_list statement>> )*
+  private static boolean while_statement_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "while_statement_4")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!while_statement_4_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "while_statement_4", c)) break;
+    }
+    return true;
+  }
+
+  // KW_ELSIF expression KW_DO <<semicolon_list statement>>
+  private static boolean while_statement_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "while_statement_4_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KW_ELSIF);
+    r = r && expression(b, l + 1);
+    r = r && consumeToken(b, KW_DO);
+    r = r && semicolon_list(b, l + 1, OberonParser::statement);
+    exit_section_(b, m, null, r);
     return r;
   }
 

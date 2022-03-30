@@ -8,9 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface OberonWhileStatement extends PsiElement {
 
   @NotNull
-  OberonExpression getExpression();
+  List<OberonExpression> getExpressionList();
 
   @NotNull
-  OberonStatementSequence getStatementSequence();
+  List<OberonStatement> getStatementList();
 
 }

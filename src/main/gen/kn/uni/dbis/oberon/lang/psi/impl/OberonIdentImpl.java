@@ -28,9 +28,9 @@ public class OberonIdentImpl extends ASTWrapperPsiElement implements OberonIdent
   }
 
   @Override
-  @NotNull
-  public PsiElement getIdentifier() {
-    return findNotNullChildByType(IDENTIFIER);
+  @Nullable
+  public OberonBuiltinType getBuiltinType() {
+    return findChildByClass(OberonBuiltinType.class);
   }
 
 }

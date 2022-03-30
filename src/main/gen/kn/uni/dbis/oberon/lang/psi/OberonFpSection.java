@@ -7,10 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface OberonFpSection extends PsiElement {
 
-  @Nullable
-  OberonIdentList getIdentList();
+  @NotNull
+  List<OberonIdent> getIdentList();
 
   @Nullable
-  OberonType getType();
+  OberonQualident getQualident();
 
 }

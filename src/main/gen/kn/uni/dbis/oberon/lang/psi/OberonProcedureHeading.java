@@ -11,9 +11,6 @@ public interface OberonProcedureHeading extends PsiElement {
   OberonFormalParameters getFormalParameters();
 
   @NotNull
-  OberonIdent getIdent();
-
-  @Nullable
-  OberonType getType();
+  OberonIdentdef getIdentdef();
 
 }

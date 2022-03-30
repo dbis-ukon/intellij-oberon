@@ -11,14 +11,14 @@ import static kn.uni.dbis.oberon.lang.psi.OberonTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import kn.uni.dbis.oberon.lang.psi.*;
 
-public class OberonIdentListImpl extends ASTWrapperPsiElement implements OberonIdentList {
+public class OberonProcedureTypeImpl extends ASTWrapperPsiElement implements OberonProcedureType {
 
-  public OberonIdentListImpl(@NotNull ASTNode node) {
+  public OberonProcedureTypeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull OberonVisitor visitor) {
-    visitor.visitIdentList(this);
+    visitor.visitProcedureType(this);
   }
 
   @Override
@@ -28,9 +28,9 @@ public class OberonIdentListImpl extends ASTWrapperPsiElement implements OberonI
   }
 
   @Override
-  @NotNull
-  public List<OberonIdent> getIdentList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonIdent.class);
+  @Nullable
+  public OberonFormalParameters getFormalParameters() {
+    return findChildByClass(OberonFormalParameters.class);
   }
 
 }

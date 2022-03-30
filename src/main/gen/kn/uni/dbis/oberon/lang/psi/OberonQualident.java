@@ -5,10 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonConstDeclarations extends PsiElement {
-
-  @NotNull
-  List<OberonExpression> getExpressionList();
+public interface OberonQualident extends PsiElement {
 
   @NotNull
   List<OberonIdent> getIdentList();

@@ -11,6 +11,6 @@ public interface OberonProcedureCall extends PsiElement {
   OberonActualParameters getActualParameters();
 
   @NotNull
-  OberonIdent getIdent();
+  OberonDesignator getDesignator();
 
 }

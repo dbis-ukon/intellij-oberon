@@ -5,10 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonRecordField extends PsiElement {
-
-  @NotNull
-  OberonIdentList getIdentList();
+public interface OberonPointerType extends PsiElement {
 
   @NotNull
   OberonType getType();

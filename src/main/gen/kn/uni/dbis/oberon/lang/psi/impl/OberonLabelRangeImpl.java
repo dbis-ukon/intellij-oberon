@@ -11,14 +11,14 @@ import static kn.uni.dbis.oberon.lang.psi.OberonTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import kn.uni.dbis.oberon.lang.psi.*;
 
-public class OberonIntegerImpl extends ASTWrapperPsiElement implements OberonInteger {
+public class OberonLabelRangeImpl extends ASTWrapperPsiElement implements OberonLabelRange {
 
-  public OberonIntegerImpl(@NotNull ASTNode node) {
+  public OberonLabelRangeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull OberonVisitor visitor) {
-    visitor.visitInteger(this);
+    visitor.visitLabelRange(this);
   }
 
   @Override
@@ -29,8 +29,8 @@ public class OberonIntegerImpl extends ASTWrapperPsiElement implements OberonInt
 
   @Override
   @NotNull
-  public PsiElement getIntegerLiteral() {
-    return findNotNullChildByType(INTEGER_LITERAL);
+  public List<OberonLabel> getLabelList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonLabel.class);
   }
 
 }

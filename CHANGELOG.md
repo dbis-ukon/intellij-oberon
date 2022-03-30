@@ -3,6 +3,8 @@
 # intellij-oberon Changelog
 
 ## [Unreleased]
+### Added
+- Support for Oberon 07
 
 ## [0.0.1-alpha]
 ### Added

@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface OberonRecordType extends PsiElement {
 
   @NotNull
-  List<OberonRecordField> getRecordFieldList();
+  List<OberonFieldList> getFieldListList();
+
+  @Nullable
+  OberonQualident getQualident();
 
 }

@@ -10,4 +10,7 @@ public interface OberonFormalParameters extends PsiElement {
   @NotNull
   List<OberonFpSection> getFpSectionList();
 
+  @Nullable
+  OberonQualident getQualident();
+
 }

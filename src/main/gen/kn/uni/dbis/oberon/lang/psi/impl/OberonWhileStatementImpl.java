@@ -29,14 +29,14 @@ public class OberonWhileStatementImpl extends ASTWrapperPsiElement implements Ob
 
   @Override
   @NotNull
-  public OberonExpression getExpression() {
-    return findNotNullChildByClass(OberonExpression.class);
+  public List<OberonExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonExpression.class);
   }
 
   @Override
   @NotNull
-  public OberonStatementSequence getStatementSequence() {
-    return findNotNullChildByClass(OberonStatementSequence.class);
+  public List<OberonStatement> getStatementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonStatement.class);
   }
 
 }

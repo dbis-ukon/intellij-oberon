@@ -11,14 +11,14 @@ import static kn.uni.dbis.oberon.lang.psi.OberonTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import kn.uni.dbis.oberon.lang.psi.*;
 
-public class OberonRealImpl extends ASTWrapperPsiElement implements OberonReal {
+public class OberonQualidentImpl extends ASTWrapperPsiElement implements OberonQualident {
 
-  public OberonRealImpl(@NotNull ASTNode node) {
+  public OberonQualidentImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull OberonVisitor visitor) {
-    visitor.visitReal(this);
+    visitor.visitQualident(this);
   }
 
   @Override
@@ -29,8 +29,8 @@ public class OberonRealImpl extends ASTWrapperPsiElement implements OberonReal {
 
   @Override
   @NotNull
-  public PsiElement getRealLiteral() {
-    return findNotNullChildByType(REAL_LITERAL);
+  public List<OberonIdent> getIdentList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonIdent.class);
   }
 
 }

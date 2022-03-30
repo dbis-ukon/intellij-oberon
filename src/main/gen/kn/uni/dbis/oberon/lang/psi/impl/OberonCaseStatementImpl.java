@@ -11,14 +11,14 @@ import static kn.uni.dbis.oberon.lang.psi.OberonTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import kn.uni.dbis.oberon.lang.psi.*;
 
-public class OberonRecordFieldImpl extends ASTWrapperPsiElement implements OberonRecordField {
+public class OberonCaseStatementImpl extends ASTWrapperPsiElement implements OberonCaseStatement {
 
-  public OberonRecordFieldImpl(@NotNull ASTNode node) {
+  public OberonCaseStatementImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull OberonVisitor visitor) {
-    visitor.visitRecordField(this);
+    visitor.visitCaseStatement(this);
   }
 
   @Override
@@ -29,14 +29,14 @@ public class OberonRecordFieldImpl extends ASTWrapperPsiElement implements Obero
 
   @Override
   @NotNull
-  public OberonIdentList getIdentList() {
-    return findNotNullChildByClass(OberonIdentList.class);
+  public List<OberonCase> getCaseList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonCase.class);
   }
 
   @Override
   @NotNull
-  public OberonType getType() {
-    return findNotNullChildByClass(OberonType.class);
+  public OberonExpression getExpression() {
+    return findNotNullChildByClass(OberonExpression.class);
   }
 
 }

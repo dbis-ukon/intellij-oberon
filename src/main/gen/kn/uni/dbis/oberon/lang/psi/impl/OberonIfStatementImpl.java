@@ -35,8 +35,8 @@ public class OberonIfStatementImpl extends ASTWrapperPsiElement implements Obero
 
   @Override
   @NotNull
-  public List<OberonStatementSequence> getStatementSequenceList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonStatementSequence.class);
+  public List<OberonStatement> getStatementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonStatement.class);
   }
 
 }

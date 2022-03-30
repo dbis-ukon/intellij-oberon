@@ -29,14 +29,20 @@ public class OberonProcedureBodyImpl extends ASTWrapperPsiElement implements Obe
 
   @Override
   @NotNull
-  public OberonDeclarations getDeclarations() {
-    return findNotNullChildByClass(OberonDeclarations.class);
+  public OberonDeclarationSequence getDeclarationSequence() {
+    return findNotNullChildByClass(OberonDeclarationSequence.class);
   }
 
   @Override
   @Nullable
-  public OberonStatementSequence getStatementSequence() {
-    return findChildByClass(OberonStatementSequence.class);
+  public OberonExpression getExpression() {
+    return findChildByClass(OberonExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public List<OberonStatement> getStatementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonStatement.class);
   }
 
 }

@@ -11,7 +11,7 @@ public interface OberonFactor extends PsiElement {
   OberonActualParameters getActualParameters();
 
   @Nullable
-  OberonBoolean getBoolean();
+  OberonDesignator getDesignator();
 
   @Nullable
   OberonExpression getExpression();
@@ -20,16 +20,10 @@ public interface OberonFactor extends PsiElement {
   OberonFactor getFactor();
 
   @Nullable
-  OberonIdent getIdent();
+  OberonNumber getNumber();
 
   @Nullable
-  OberonInteger getInteger();
-
-  @Nullable
-  OberonReal getReal();
-
-  @NotNull
-  List<OberonSelector> getSelectorList();
+  OberonSet getSet();
 
   @Nullable
   OberonString getString();

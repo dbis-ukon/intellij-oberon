@@ -7,10 +7,13 @@ import com.intellij.psi.PsiElement;
 
 public interface OberonSelector extends PsiElement {
 
-  @Nullable
-  OberonExpression getExpression();
+  @NotNull
+  List<OberonExpression> getExpressionList();
 
   @Nullable
   OberonIdent getIdent();
+
+  @Nullable
+  OberonQualident getQualident();
 
 }

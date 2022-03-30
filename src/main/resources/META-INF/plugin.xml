@@ -2,7 +2,33 @@
 <idea-plugin>
     <id>kn.uni.dbis.oberon.lang</id>
     <name>Oberon</name>
+    <version>0.0.1-alpha</version>
     <vendor url="https://dbis.uni.kn" email="dbis@uni-konstanz.de">University of Konstanz (DBIS)</vendor>
+    <idea-version since-build="211" until-build="221.*"/>
+    <description>
+        <![CDATA[
+<p>Provides Oberon language support for the IntelliJ platform. The following features are currently available for with any
+compatible IntelliJ platform.</p>
+<ol>
+<li>Coding assistance (highlighting, etc.)</li>
+</ol>
+<br/>
+<p>Features planned for future releases are listed below.</p>
+<ol>
+<li>More coding assistance (completion, folding, formatting, etc.)</li>
+<li>Refactorings</li>
+<li>Navigation and search</li>
+<li>Building with a supported Oberon compiler</li>
+</ol>
+<br/>
+<p>More Information</p>
+<li>Project repository on <a href="https://github.com/DBIS-UniKN/intellij-oberon">GitHub</a></li>
+<li>Report an <a href="https://github.com/DBIS-UniKN/intellij-oberon/issues">issue</a></li>
+<li>Information about the <a href="https://people.inf.ethz.ch/wirth/Oberon/index.html">Oberon</a> programming language maintained by <a href="https://en.wikipedia.org/wiki/Niklaus_Wirth">Niklaus Wirth</a></li>
+</ol>
+        ]]>
+    </description>
+
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">

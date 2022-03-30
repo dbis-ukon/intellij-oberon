@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonInteger extends PsiElement {
-
-  @NotNull
-  PsiElement getIntegerLiteral();
+public interface OberonAndOperator extends PsiElement {
 
 }

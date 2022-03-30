@@ -28,15 +28,21 @@ public class OberonSelectorImpl extends ASTWrapperPsiElement implements OberonSe
   }
 
   @Override
-  @Nullable
-  public OberonExpression getExpression() {
-    return findChildByClass(OberonExpression.class);
+  @NotNull
+  public List<OberonExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonExpression.class);
   }
 
   @Override
   @Nullable
   public OberonIdent getIdent() {
     return findChildByClass(OberonIdent.class);
+  }
+
+  @Override
+  @Nullable
+  public OberonQualident getQualident() {
+    return findChildByClass(OberonQualident.class);
   }
 
 }

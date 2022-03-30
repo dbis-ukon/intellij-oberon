@@ -41,8 +41,8 @@ public class OberonForStatementImpl extends ASTWrapperPsiElement implements Ober
 
   @Override
   @NotNull
-  public OberonStatementSequence getStatementSequence() {
-    return findNotNullChildByClass(OberonStatementSequence.class);
+  public List<OberonStatement> getStatementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonStatement.class);
   }
 
 }

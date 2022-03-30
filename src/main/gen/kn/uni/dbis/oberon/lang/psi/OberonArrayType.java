@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface OberonArrayType extends PsiElement {
 
   @NotNull
-  OberonExpression getExpression();
+  List<OberonExpression> getExpressionList();
 
   @NotNull
   OberonType getType();

@@ -11,6 +11,6 @@ public interface OberonIfStatement extends PsiElement {
   List<OberonExpression> getExpressionList();
 
   @NotNull
-  List<OberonStatementSequence> getStatementSequenceList();
+  List<OberonStatement> getStatementList();
 
 }

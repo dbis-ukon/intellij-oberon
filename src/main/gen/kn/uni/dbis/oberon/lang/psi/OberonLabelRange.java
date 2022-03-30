@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonStatementSequence extends PsiElement {
+public interface OberonLabelRange extends PsiElement {
 
   @NotNull
-  List<OberonStatement> getStatementList();
+  List<OberonLabel> getLabelList();
 
 }

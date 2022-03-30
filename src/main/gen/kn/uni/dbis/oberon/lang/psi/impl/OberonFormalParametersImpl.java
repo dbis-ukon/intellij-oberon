@@ -33,4 +33,10 @@ public class OberonFormalParametersImpl extends ASTWrapperPsiElement implements 
     return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonFpSection.class);
   }
 
+  @Override
+  @Nullable
+  public OberonQualident getQualident() {
+    return findChildByClass(OberonQualident.class);
+  }
+
 }

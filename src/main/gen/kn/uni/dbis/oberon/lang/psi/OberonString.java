@@ -7,7 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface OberonString extends PsiElement {
 
-  @NotNull
-  PsiElement getStringLiteral();
-
 }

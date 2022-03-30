@@ -9,51 +9,66 @@ import kn.uni.dbis.oberon.lang.psi.impl.*;
 public interface OberonTypes {
 
   IElementType ACTUAL_PARAMETERS = new OberonElementType("ACTUAL_PARAMETERS");
+  IElementType AND_OPERATOR = new OberonElementType("AND_OPERATOR");
   IElementType ARRAY_TYPE = new OberonElementType("ARRAY_TYPE");
   IElementType ASSIGNMENT = new OberonElementType("ASSIGNMENT");
-  IElementType BOOLEAN = new OberonElementType("BOOLEAN");
   IElementType BUILTIN_TYPE = new OberonElementType("BUILTIN_TYPE");
-  IElementType CONST_DECLARATIONS = new OberonElementType("CONST_DECLARATIONS");
-  IElementType DECLARATIONS = new OberonElementType("DECLARATIONS");
+  IElementType CASE = new OberonElementType("CASE");
+  IElementType CASE_STATEMENT = new OberonElementType("CASE_STATEMENT");
+  IElementType CONST_DECLARATION = new OberonElementType("CONST_DECLARATION");
+  IElementType DECLARATION_SEQUENCE = new OberonElementType("DECLARATION_SEQUENCE");
+  IElementType DESIGNATOR = new OberonElementType("DESIGNATOR");
+  IElementType ELEMENT = new OberonElementType("ELEMENT");
   IElementType EXPRESSION = new OberonElementType("EXPRESSION");
   IElementType FACTOR = new OberonElementType("FACTOR");
+  IElementType FIELD_LIST = new OberonElementType("FIELD_LIST");
   IElementType FORMAL_PARAMETERS = new OberonElementType("FORMAL_PARAMETERS");
   IElementType FOR_STATEMENT = new OberonElementType("FOR_STATEMENT");
   IElementType FP_SECTION = new OberonElementType("FP_SECTION");
   IElementType IDENT = new OberonElementType("IDENT");
-  IElementType IDENT_LIST = new OberonElementType("IDENT_LIST");
+  IElementType IDENTDEF = new OberonElementType("IDENTDEF");
   IElementType IF_STATEMENT = new OberonElementType("IF_STATEMENT");
-  IElementType INTEGER = new OberonElementType("INTEGER");
+  IElementType IMPORT = new OberonElementType("IMPORT");
+  IElementType IMPORT_LIST = new OberonElementType("IMPORT_LIST");
+  IElementType LABEL = new OberonElementType("LABEL");
+  IElementType LABEL_RANGE = new OberonElementType("LABEL_RANGE");
   IElementType LOOP_STATEMENT = new OberonElementType("LOOP_STATEMENT");
+  IElementType MULT_OPERATOR = new OberonElementType("MULT_OPERATOR");
+  IElementType NUMBER = new OberonElementType("NUMBER");
+  IElementType POINTER_TYPE = new OberonElementType("POINTER_TYPE");
   IElementType PROCEDURE_BODY = new OberonElementType("PROCEDURE_BODY");
   IElementType PROCEDURE_CALL = new OberonElementType("PROCEDURE_CALL");
   IElementType PROCEDURE_DECLARATION = new OberonElementType("PROCEDURE_DECLARATION");
   IElementType PROCEDURE_HEADING = new OberonElementType("PROCEDURE_HEADING");
-  IElementType REAL = new OberonElementType("REAL");
-  IElementType RECORD_FIELD = new OberonElementType("RECORD_FIELD");
+  IElementType PROCEDURE_TYPE = new OberonElementType("PROCEDURE_TYPE");
+  IElementType QUALIDENT = new OberonElementType("QUALIDENT");
   IElementType RECORD_TYPE = new OberonElementType("RECORD_TYPE");
+  IElementType RELATION = new OberonElementType("RELATION");
   IElementType REPEAT_STATEMENT = new OberonElementType("REPEAT_STATEMENT");
   IElementType SELECTOR = new OberonElementType("SELECTOR");
+  IElementType SET = new OberonElementType("SET");
   IElementType SIMPLE_EXPRESSION = new OberonElementType("SIMPLE_EXPRESSION");
   IElementType STATEMENT = new OberonElementType("STATEMENT");
-  IElementType STATEMENT_SEQUENCE = new OberonElementType("STATEMENT_SEQUENCE");
   IElementType STRING = new OberonElementType("STRING");
   IElementType TERM = new OberonElementType("TERM");
   IElementType TYPE = new OberonElementType("TYPE");
-  IElementType TYPE_DECLARATIONS = new OberonElementType("TYPE_DECLARATIONS");
-  IElementType VAR_DECLARATIONS = new OberonElementType("VAR_DECLARATIONS");
+  IElementType TYPE_DECLARATION = new OberonElementType("TYPE_DECLARATION");
+  IElementType VARIABLE_DECLARATION = new OberonElementType("VARIABLE_DECLARATION");
   IElementType WHILE_STATEMENT = new OberonElementType("WHILE_STATEMENT");
 
   IElementType COLON = new OberonTokenType(":");
   IElementType COMMA = new OberonTokenType(",");
+  IElementType COMMAN = new OberonTokenType("COMMAN");
   IElementType COMMENT = new OberonTokenType("COMMENT");
   IElementType IDENTIFIER = new OberonTokenType("IDENTIFIER");
+  IElementType INTEGER = new OberonTokenType("integer");
   IElementType INTEGER_LITERAL = new OberonTokenType("INTEGER_LITERAL");
   IElementType KW_AND = new OberonTokenType("AND");
   IElementType KW_ARRAY = new OberonTokenType("ARRAY");
   IElementType KW_BEGIN = new OberonTokenType("BEGIN");
   IElementType KW_BOOLEAN = new OberonTokenType("BOOLEAN");
   IElementType KW_BY = new OberonTokenType("BY");
+  IElementType KW_CASE = new OberonTokenType("CASE");
   IElementType KW_CONST = new OberonTokenType("CONST");
   IElementType KW_DO = new OberonTokenType("DO");
   IElementType KW_ELSE = new OberonTokenType("ELSE");
@@ -65,13 +80,16 @@ public interface OberonTypes {
   IElementType KW_FOR = new OberonTokenType("FOR");
   IElementType KW_FUNCTION = new OberonTokenType("FUNCTION");
   IElementType KW_IF = new OberonTokenType("IF");
+  IElementType KW_IMPORT = new OberonTokenType("IMPORT");
   IElementType KW_INTEGER = new OberonTokenType("INTEGER");
   IElementType KW_LONGINT = new OberonTokenType("LONGINT");
   IElementType KW_LONGREAL = new OberonTokenType("LONGREAL");
   IElementType KW_LOOP = new OberonTokenType("LOOP");
   IElementType KW_MODULE = new OberonTokenType("MODULE");
   IElementType KW_NEW = new OberonTokenType("NEW");
+  IElementType KW_NIL = new OberonTokenType("NIL");
   IElementType KW_OF = new OberonTokenType("OF");
+  IElementType KW_POINTER = new OberonTokenType("POINTER");
   IElementType KW_PROCEDURE = new OberonTokenType("PROCEDURE");
   IElementType KW_REAL = new OberonTokenType("REAL");
   IElementType KW_RECORD = new OberonTokenType("RECORD");
@@ -89,12 +107,17 @@ public interface OberonTypes {
   IElementType LBRACE = new OberonTokenType("{");
   IElementType LBRACK = new OberonTokenType("[");
   IElementType LPAREN = new OberonTokenType("(");
+  IElementType LW_LOOP = new OberonTokenType("LW_LOOP");
   IElementType OP_AND = new OberonTokenType("&");
   IElementType OP_BECOMES = new OberonTokenType(":=");
+  IElementType OP_DEREF = new OberonTokenType("^");
   IElementType OP_DIV = new OberonTokenType("DIV");
+  IElementType OP_DIVIDE = new OberonTokenType("/");
   IElementType OP_EQ = new OberonTokenType("=");
   IElementType OP_GEQ = new OberonTokenType(">=");
   IElementType OP_GT = new OberonTokenType(">");
+  IElementType OP_IN = new OberonTokenType("IN");
+  IElementType OP_IS = new OberonTokenType("IS");
   IElementType OP_LEQ = new OberonTokenType("<=");
   IElementType OP_LT = new OberonTokenType("<");
   IElementType OP_MINUS = new OberonTokenType("-");
@@ -106,6 +129,7 @@ public interface OberonTypes {
   IElementType OP_TIMES = new OberonTokenType("*");
   IElementType PERIOD = new OberonTokenType(".");
   IElementType PIPE = new OberonTokenType("|");
+  IElementType RANGE = new OberonTokenType("..");
   IElementType RBRACE = new OberonTokenType("}");
   IElementType RBRACK = new OberonTokenType("]");
   IElementType REAL_LITERAL = new OberonTokenType("REAL_LITERAL");
@@ -120,29 +144,44 @@ public interface OberonTypes {
       if (type == ACTUAL_PARAMETERS) {
         return new OberonActualParametersImpl(node);
       }
+      else if (type == AND_OPERATOR) {
+        return new OberonAndOperatorImpl(node);
+      }
       else if (type == ARRAY_TYPE) {
         return new OberonArrayTypeImpl(node);
       }
       else if (type == ASSIGNMENT) {
         return new OberonAssignmentImpl(node);
       }
-      else if (type == BOOLEAN) {
-        return new OberonBooleanImpl(node);
-      }
       else if (type == BUILTIN_TYPE) {
         return new OberonBuiltinTypeImpl(node);
       }
-      else if (type == CONST_DECLARATIONS) {
-        return new OberonConstDeclarationsImpl(node);
+      else if (type == CASE) {
+        return new OberonCaseImpl(node);
       }
-      else if (type == DECLARATIONS) {
-        return new OberonDeclarationsImpl(node);
+      else if (type == CASE_STATEMENT) {
+        return new OberonCaseStatementImpl(node);
+      }
+      else if (type == CONST_DECLARATION) {
+        return new OberonConstDeclarationImpl(node);
+      }
+      else if (type == DECLARATION_SEQUENCE) {
+        return new OberonDeclarationSequenceImpl(node);
+      }
+      else if (type == DESIGNATOR) {
+        return new OberonDesignatorImpl(node);
+      }
+      else if (type == ELEMENT) {
+        return new OberonElementImpl(node);
       }
       else if (type == EXPRESSION) {
         return new OberonExpressionImpl(node);
       }
       else if (type == FACTOR) {
         return new OberonFactorImpl(node);
+      }
+      else if (type == FIELD_LIST) {
+        return new OberonFieldListImpl(node);
       }
       else if (type == FORMAL_PARAMETERS) {
         return new OberonFormalParametersImpl(node);
@@ -156,17 +195,35 @@ public interface OberonTypes {
       else if (type == IDENT) {
         return new OberonIdentImpl(node);
       }
-      else if (type == IDENT_LIST) {
-        return new OberonIdentListImpl(node);
+      else if (type == IDENTDEF) {
+        return new OberonIdentdefImpl(node);
       }
       else if (type == IF_STATEMENT) {
         return new OberonIfStatementImpl(node);
       }
-      else if (type == INTEGER) {
-        return new OberonIntegerImpl(node);
+      else if (type == IMPORT) {
+        return new OberonImportImpl(node);
+      }
+      else if (type == IMPORT_LIST) {
+        return new OberonImportListImpl(node);
+      }
+      else if (type == LABEL) {
+        return new OberonLabelImpl(node);
+      }
+      else if (type == LABEL_RANGE) {
+        return new OberonLabelRangeImpl(node);
       }
       else if (type == LOOP_STATEMENT) {
         return new OberonLoopStatementImpl(node);
+      }
+      else if (type == MULT_OPERATOR) {
+        return new OberonMultOperatorImpl(node);
+      }
+      else if (type == NUMBER) {
+        return new OberonNumberImpl(node);
+      }
+      else if (type == POINTER_TYPE) {
+        return new OberonPointerTypeImpl(node);
       }
       else if (type == PROCEDURE_BODY) {
         return new OberonProcedureBodyImpl(node);
@@ -180,14 +237,17 @@ public interface OberonTypes {
       else if (type == PROCEDURE_HEADING) {
         return new OberonProcedureHeadingImpl(node);
       }
-      else if (type == REAL) {
-        return new OberonRealImpl(node);
+      else if (type == PROCEDURE_TYPE) {
+        return new OberonProcedureTypeImpl(node);
       }
-      else if (type == RECORD_FIELD) {
-        return new OberonRecordFieldImpl(node);
+      else if (type == QUALIDENT) {
+        return new OberonQualidentImpl(node);
       }
       else if (type == RECORD_TYPE) {
         return new OberonRecordTypeImpl(node);
+      }
+      else if (type == RELATION) {
+        return new OberonRelationImpl(node);
       }
       else if (type == REPEAT_STATEMENT) {
         return new OberonRepeatStatementImpl(node);
@@ -195,14 +255,14 @@ public interface OberonTypes {
       else if (type == SELECTOR) {
         return new OberonSelectorImpl(node);
       }
+      else if (type == SET) {
+        return new OberonSetImpl(node);
+      }
       else if (type == SIMPLE_EXPRESSION) {
         return new OberonSimpleExpressionImpl(node);
       }
       else if (type == STATEMENT) {
         return new OberonStatementImpl(node);
-      }
-      else if (type == STATEMENT_SEQUENCE) {
-        return new OberonStatementSequenceImpl(node);
       }
       else if (type == STRING) {
         return new OberonStringImpl(node);
@@ -213,11 +273,11 @@ public interface OberonTypes {
       else if (type == TYPE) {
         return new OberonTypeImpl(node);
       }
-      else if (type == TYPE_DECLARATIONS) {
-        return new OberonTypeDeclarationsImpl(node);
+      else if (type == TYPE_DECLARATION) {
+        return new OberonTypeDeclarationImpl(node);
       }
-      else if (type == VAR_DECLARATIONS) {
-        return new OberonVarDeclarationsImpl(node);
+      else if (type == VARIABLE_DECLARATION) {
+        return new OberonVariableDeclarationImpl(node);
       }
       else if (type == WHILE_STATEMENT) {
         return new OberonWhileStatementImpl(node);

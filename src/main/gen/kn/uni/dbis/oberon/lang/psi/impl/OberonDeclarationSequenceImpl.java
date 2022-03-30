@@ -11,14 +11,14 @@ import static kn.uni.dbis.oberon.lang.psi.OberonTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import kn.uni.dbis.oberon.lang.psi.*;
 
-public class OberonDeclarationsImpl extends ASTWrapperPsiElement implements OberonDeclarations {
+public class OberonDeclarationSequenceImpl extends ASTWrapperPsiElement implements OberonDeclarationSequence {
 
-  public OberonDeclarationsImpl(@NotNull ASTNode node) {
+  public OberonDeclarationSequenceImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull OberonVisitor visitor) {
-    visitor.visitDeclarations(this);
+    visitor.visitDeclarationSequence(this);
   }
 
   @Override
@@ -28,9 +28,9 @@ public class OberonDeclarationsImpl extends ASTWrapperPsiElement implements Ober
   }
 
   @Override
-  @Nullable
-  public OberonConstDeclarations getConstDeclarations() {
-    return findChildByClass(OberonConstDeclarations.class);
+  @NotNull
+  public List<OberonConstDeclaration> getConstDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonConstDeclaration.class);
   }
 
   @Override
@@ -40,15 +40,15 @@ public class OberonDeclarationsImpl extends ASTWrapperPsiElement implements Ober
   }
 
   @Override
-  @Nullable
-  public OberonTypeDeclarations getTypeDeclarations() {
-    return findChildByClass(OberonTypeDeclarations.class);
+  @NotNull
+  public List<OberonTypeDeclaration> getTypeDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonTypeDeclaration.class);
   }
 
   @Override
-  @Nullable
-  public OberonVarDeclarations getVarDeclarations() {
-    return findChildByClass(OberonVarDeclarations.class);
+  @NotNull
+  public List<OberonVariableDeclaration> getVariableDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonVariableDeclaration.class);
   }
 
 }

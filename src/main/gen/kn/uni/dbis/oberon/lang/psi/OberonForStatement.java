@@ -14,6 +14,6 @@ public interface OberonForStatement extends PsiElement {
   OberonIdent getIdent();
 
   @NotNull
-  OberonStatementSequence getStatementSequence();
+  List<OberonStatement> getStatementList();
 
 }

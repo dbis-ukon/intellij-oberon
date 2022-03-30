@@ -11,14 +11,14 @@ import static kn.uni.dbis.oberon.lang.psi.OberonTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import kn.uni.dbis.oberon.lang.psi.*;
 
-public class OberonStatementSequenceImpl extends ASTWrapperPsiElement implements OberonStatementSequence {
+public class OberonElementImpl extends ASTWrapperPsiElement implements OberonElement {
 
-  public OberonStatementSequenceImpl(@NotNull ASTNode node) {
+  public OberonElementImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull OberonVisitor visitor) {
-    visitor.visitStatementSequence(this);
+    visitor.visitElement(this);
   }
 
   @Override
@@ -29,8 +29,8 @@ public class OberonStatementSequenceImpl extends ASTWrapperPsiElement implements
 
   @Override
   @NotNull
-  public List<OberonStatement> getStatementList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonStatement.class);
+  public List<OberonExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonExpression.class);
   }
 
 }

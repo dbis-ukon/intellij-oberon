@@ -11,10 +11,13 @@ public interface OberonType extends PsiElement {
   OberonArrayType getArrayType();
 
   @Nullable
-  OberonBuiltinType getBuiltinType();
+  OberonPointerType getPointerType();
 
   @Nullable
-  OberonIdent getIdent();
+  OberonProcedureType getProcedureType();
+
+  @Nullable
+  OberonQualident getQualident();
 
   @Nullable
   OberonRecordType getRecordType();

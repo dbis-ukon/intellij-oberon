@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonReal extends PsiElement {
-
-  @NotNull
-  PsiElement getRealLiteral();
+public interface OberonMultOperator extends PsiElement {
 
 }

@@ -5,6 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface OberonBoolean extends PsiElement {
+public interface OberonImport extends PsiElement {
+
+  @NotNull
+  List<OberonIdent> getIdentList();
 
 }

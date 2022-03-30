@@ -35,8 +35,8 @@ public class OberonFactorImpl extends ASTWrapperPsiElement implements OberonFact
 
   @Override
   @Nullable
-  public OberonBoolean getBoolean() {
-    return findChildByClass(OberonBoolean.class);
+  public OberonDesignator getDesignator() {
+    return findChildByClass(OberonDesignator.class);
   }
 
   @Override
@@ -53,26 +53,14 @@ public class OberonFactorImpl extends ASTWrapperPsiElement implements OberonFact
 
   @Override
   @Nullable
-  public OberonIdent getIdent() {
-    return findChildByClass(OberonIdent.class);
+  public OberonNumber getNumber() {
+    return findChildByClass(OberonNumber.class);
   }
 
   @Override
   @Nullable
-  public OberonInteger getInteger() {
-    return findChildByClass(OberonInteger.class);
-  }
-
-  @Override
-  @Nullable
-  public OberonReal getReal() {
-    return findChildByClass(OberonReal.class);
-  }
-
-  @Override
-  @NotNull
-  public List<OberonSelector> getSelectorList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonSelector.class);
+  public OberonSet getSet() {
+    return findChildByClass(OberonSet.class);
   }
 
   @Override

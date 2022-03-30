@@ -29,20 +29,14 @@ public class OberonAssignmentImpl extends ASTWrapperPsiElement implements Oberon
 
   @Override
   @NotNull
+  public OberonDesignator getDesignator() {
+    return findNotNullChildByClass(OberonDesignator.class);
+  }
+
+  @Override
+  @NotNull
   public OberonExpression getExpression() {
     return findNotNullChildByClass(OberonExpression.class);
-  }
-
-  @Override
-  @NotNull
-  public OberonIdent getIdent() {
-    return findNotNullChildByClass(OberonIdent.class);
-  }
-
-  @Override
-  @NotNull
-  public List<OberonSelector> getSelectorList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonSelector.class);
   }
 
 }

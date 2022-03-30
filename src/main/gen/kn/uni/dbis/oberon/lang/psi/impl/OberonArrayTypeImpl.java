@@ -29,8 +29,8 @@ public class OberonArrayTypeImpl extends ASTWrapperPsiElement implements OberonA
 
   @Override
   @NotNull
-  public OberonExpression getExpression() {
-    return findNotNullChildByClass(OberonExpression.class);
+  public List<OberonExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonExpression.class);
   }
 
   @Override
