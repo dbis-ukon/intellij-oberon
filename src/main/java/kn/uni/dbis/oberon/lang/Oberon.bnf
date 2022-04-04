@@ -15,8 +15,6 @@
   psiImplUtilClass="kn.uni.dbis.oberon.lang.psi.impl.OberonPsiImplUtil"
 
   tokens = [
-    COMMENT="COMMENT"
-
     // Basics
     COLON = ":"
     COMMA = ","
@@ -95,55 +93,71 @@
     OP_OR = "OR"
     OP_PLUS = "+"
     OP_TIMES = "*"
+
+    // COMMENT="COMMENT"
+    SPACE = 'regexp:\s+'
+    COMMENT = 'regexp:\(\*(.|[\r\n])*?\*\)'
+
+    INTEGER_LITERAL = 'regexp:0|[1-9][0-9]*|0H|[1-9A-F][0-9A-F]*H'
+    REAL_LITERAL = 'regexp:([0-9]+\.[0-9]+([eE](\+|-)?[0-9]+)?|[0-9]+([eE](\+|-)?[0-9]+))'
+    STRING_LITERAL = 'regexp:\"(\\[ \t\n\x0B\f\r]*\n[ \t\n\x0B\f\r]*\\|\\\"|[^\"\n])*\"'
+
+    IDENTIFIER = 'regexp:[a-zA-Z][a-zA-Z0-9]*'
+
   ]
 }
 
-module ::= KW_MODULE ident SEMICOLON [ import_list ] declaration_sequence [ KW_BEGIN <<semicolon_list statement>> ] KW_END ident PERIOD
-import_list ::= KW_IMPORT <<comma_list import>> SEMICOLON
-import ::= ident [ OP_BECOMES ident ]
+
+module ::= KW_MODULE ident SEMICOLON
+           [ import_list ]
+           declaration_sequence
+           [ KW_BEGIN <<semicolon_list statement>> ]
+           KW_END ident PERIOD {pin=1}
+import_list ::= KW_IMPORT <<comma_list import>> SEMICOLON {pin=1 recoverWhile=import_list_rec}
+import ::= ident [ OP_BECOMES ident ] {pin=1 recoverWhile=import_rec}
 
 private meta comma_list ::= <<p>> (COMMA <<p>>)*
 private meta semicolon_list ::= <<p>> (SEMICOLON <<p>>)*
 
-ident ::= IDENTIFIER | builtin_type
+ident ::= IDENTIFIER | builtin_type {recoverWhile=ident_rec name="identifier"}
 qualident ::= [ ident PERIOD ] ident
 identdef ::= ident [ OP_TIMES ]
 
-number ::= INTEGER_LITERAL | REAL_LITERAL
-string ::= STRING_LITERAL
+private number ::= INTEGER_LITERAL | REAL_LITERAL
+private string ::= STRING_LITERAL
 
-builtin_type ::= KW_INTEGER | KW_LONGINT | KW_REAL | KW_LONGREAL | KW_BOOLEAN | KW_STRING
+private builtin_type ::= KW_INTEGER | KW_LONGINT | KW_REAL | KW_LONGREAL | KW_BOOLEAN | KW_STRING
 
 const_declaration ::= identdef OP_EQ expression
 
 type_declaration ::= identdef OP_EQ type
-type ::= qualident | array_type | record_type | pointer_type | procedure_type
-array_type ::= KW_ARRAY expression ( COMMAN expression )* KW_OF type
+type ::= qualident | array_type | record_type | pointer_type | procedure_type {pin(".*")=1 recoverWhile="type_rec" name="type"}
+array_type ::= KW_ARRAY array_indexes KW_OF type {pin=1}
+private array_indexes ::= expression ( COMMA expression )* {pin=1}
 record_type ::= KW_RECORD [ LPAREN qualident RPAREN ] [ <<semicolon_list field_list>> ] KW_END
 field_list ::= <<comma_list identdef>> COLON type
 pointer_type ::= KW_POINTER KW_TO type
 procedure_type ::= KW_PROCEDURE [ formal_parameters ]
 
-variable_declaration ::= <<comma_list identdef>> COLON type
-
-expression ::= simple_expression [ relation simple_expression ]
-relation ::= OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ | OP_IN | OP_IS
+expression ::= simple_expression [ relation simple_expression ] {pin=1 recoverWhile=expression_rec}
+private relation ::= OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ | OP_IN | OP_IS
 simple_expression ::= [ OP_PLUS | OP_MINUS ] term ( and_operator term )*
-and_operator ::= OP_PLUS | OP_MINUS | OP_OR
+private and_operator ::= OP_PLUS | OP_MINUS | OP_OR
 term ::= factor ( mult_operator factor )*
-mult_operator ::= OP_TIMES | OP_DIVIDE | OP_DIV | OP_MOD | OP_AND
+private mult_operator ::= OP_TIMES | OP_DIVIDE | OP_DIV | OP_MOD | OP_AND
 factor ::= number | string | KW_NIL | KW_TRUE | KW_FALSE | set | designator [ actual_parameters ] |
            LPAREN expression RPAREN | OP_NOT factor
 designator ::= qualident ( selector )*
-selector ::= PERIOD ident | LBRACK <<comma_list expression>> RBRACK | OP_DEREF | LPAREN qualident RPAREN
+selector ::= PERIOD ident | array_index | OP_DEREF | LPAREN qualident RPAREN
+private array_index ::= LBRACK <<comma_list expression>> RBRACK {pin=1}
 set ::= LBRACE [ <<comma_list element>> ] RBRACE
 element ::= expression [ RANGE expression ]
 actual_parameters ::= LPAREN [ <<comma_list expression>> ] RPAREN
 
 statement ::= [ assignment | procedure_call | if_statement | case_statement |
                 while_statement | repeat_statement | for_statement | loop_statement |
-                /* with_statement | */ KW_EXIT ]
-assignment ::= designator OP_BECOMES expression
+                with_statement | KW_EXIT ] {recoverWhile=statement_rec}
+assignment ::= designator OP_BECOMES expression {pin=2}
 procedure_call ::= designator [ actual_parameters ]
 if_statement ::= KW_IF expression KW_THEN <<semicolon_list statement>>
                  ( KW_ELSIF expression KW_THEN <<semicolon_list statement>> )*
@@ -158,13 +172,37 @@ while_statement ::= KW_WHILE expression KW_DO <<semicolon_list statement>>
 repeat_statement ::= KW_REPEAT <<semicolon_list statement>> KW_UNTIL expression
 for_statement ::= KW_FOR ident OP_BECOMES expression KW_TO expression [ KW_BY expression ] KW_DO <<semicolon_list statement>> KW_END
 loop_statement ::= KW_LOOP <<semicolon_list statement>> KW_END
+with_statement ::= KW_WITH qualident COLON qualident KW_DO <<semicolon_list statement>> KW_END
 
 procedure_declaration ::= procedure_heading SEMICOLON ( procedure_body ident | KW_EXTERN )
-procedure_heading ::= KW_PROCEDURE identdef [ formal_parameters ]
+procedure_heading ::= KW_PROCEDURE identdef [ formal_parameters ] {pin=2}
 procedure_body ::= declaration_sequence [ KW_BEGIN <<semicolon_list statement>> ] [ KW_RETURN expression ] KW_END
 declaration_sequence ::= [ KW_CONST ( const_declaration SEMICOLON )* ]
                          [ KW_TYPE ( type_declaration SEMICOLON )* ]
-                         [ KW_VAR ( variable_declaration SEMICOLON )* ]
+                         [ variable_section ]
                          ( procedure_declaration SEMICOLON )*
+variable_section ::= KW_VAR variable_declarations {pin=1 recoverWhile=variables_rec}
+private variable_declarations ::= variable_declaration+ {recoverWhile=block_local_end_rec}
+private variable_declaration ::= <<comma_list identdef>> COLON type SEMICOLON {pin=1}
+
 formal_parameters ::= LPAREN [ <<semicolon_list fp_section>> ] RPAREN [ COLON qualident ]
 fp_section ::= ( [ KW_VAR ] <<comma_list ident>> COLON [ KW_ARRAY KW_OF ] qualident | VARARGS )
+
+private operator_rec ::= !( OP_PLUS | OP_MINUS | OP_TIMES | OP_DIV | OP_DIVIDE | OP_MOD | OP_EQ | OP_NEQ | OP_LT | OP_GT | OP_LEQ | OP_GEQ | OP_OR | OP_AND | OP_NOT )
+private factor_rec ::= !( KW_OF | COMMA | LPAREN | LBRACK | KW_TO | KW_ELSE | KW_ELSIF | KW_BY | KW_DO | KW_THEN | KW_UNTIL | SEMICOLON | KW_END ) & operator_rec
+private expression_rec ::= !( KW_END | KW_ELSE | KW_TO | KW_THEN | KW_UNTIL | KW_ELSIF | KW_BY | KW_DO | RPAREN | RBRACK | COMMA | SEMICOLON | KW_OF )
+private ident_rec ::= !( KW_END | KW_ELSE | PERIOD | LPAREN | OP_BECOMES | KW_THEN | COLON | KW_UNTIL | KW_ELSIF | LBRACK | RPAREN | RBRACK | SEMICOLON | KW_BY | KW_DO | COMMA | KW_OF | KW_TO ) & operator_rec
+private import_list_rec ::= !( KW_CONST | KW_TYPE | KW_VAR | KW_PROCEDURE | KW_BEGIN | KW_END )
+private import_rec ::= !( COMMA | SEMICOLON )
+private declaration_rec ::= !( SEMICOLON )
+private type_rec ::= !( RPAREN | SEMICOLON | KW_END )
+private variables_rec ::= !( KW_PROCEDURE | KW_BEGIN | KW_END )
+private statement_rec ::= !( SEMICOLON | PIPE | KW_END | KW_ELSE | KW_ELSIF | KW_UNTIL )
+
+
+//private name_rec ::= !( ident | KW_END ) & section_rec
+//private section_rec ::= !routine_key_rec & section_nested_rec
+//private routine_key_rec ::= KW_PROCEDURE
+//private section_nested_rec ::= !( KW_CONST | KW_TYPE | KW_VAR )
+//private block_local_end_rec ::= !( KW_END | SEMICOLON) & section_rec
+//private declaration_section_rec ::= !( KW_END ) & section_rec

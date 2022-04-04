@@ -58,14 +58,12 @@ public class OberonParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OP_PLUS | OP_MINUS | OP_OR
-  public static boolean and_operator(PsiBuilder b, int l) {
+  static boolean and_operator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "and_operator")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, AND_OPERATOR, "<and operator>");
     r = consumeToken(b, OP_PLUS);
     if (!r) r = consumeToken(b, OP_MINUS);
     if (!r) r = consumeToken(b, OP_OR);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -122,17 +120,15 @@ public class OberonParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // KW_INTEGER | KW_LONGINT | KW_REAL | KW_LONGREAL | KW_BOOLEAN | KW_STRING
-  public static boolean builtin_type(PsiBuilder b, int l) {
+  static boolean builtin_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "builtin_type")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, BUILTIN_TYPE, "<builtin type>");
     r = consumeToken(b, KW_INTEGER);
     if (!r) r = consumeToken(b, KW_LONGINT);
     if (!r) r = consumeToken(b, KW_REAL);
     if (!r) r = consumeToken(b, KW_LONGREAL);
     if (!r) r = consumeToken(b, KW_BOOLEAN);
     if (!r) r = consumeToken(b, KW_STRING);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -919,29 +915,25 @@ public class OberonParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OP_TIMES | OP_DIVIDE | OP_DIV | OP_MOD | OP_AND
-  public static boolean mult_operator(PsiBuilder b, int l) {
+  static boolean mult_operator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mult_operator")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, MULT_OPERATOR, "<mult operator>");
     r = consumeToken(b, OP_TIMES);
     if (!r) r = consumeToken(b, OP_DIVIDE);
     if (!r) r = consumeToken(b, OP_DIV);
     if (!r) r = consumeToken(b, OP_MOD);
     if (!r) r = consumeToken(b, OP_AND);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
   // INTEGER_LITERAL | REAL_LITERAL
-  public static boolean number(PsiBuilder b, int l) {
+  static boolean number(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "number")) return false;
-    if (!nextTokenIs(b, "<number>", INTEGER_LITERAL, REAL_LITERAL)) return false;
+    if (!nextTokenIs(b, "", INTEGER_LITERAL, REAL_LITERAL)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, NUMBER, "<number>");
     r = consumeToken(b, INTEGER_LITERAL);
     if (!r) r = consumeToken(b, REAL_LITERAL);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -1177,10 +1169,9 @@ public class OberonParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OP_EQ | OP_NEQ | OP_LT | OP_LEQ | OP_GT | OP_GEQ | OP_IN | OP_IS
-  public static boolean relation(PsiBuilder b, int l) {
+  static boolean relation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "relation")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, RELATION, "<relation>");
     r = consumeToken(b, OP_EQ);
     if (!r) r = consumeToken(b, OP_NEQ);
     if (!r) r = consumeToken(b, OP_LT);
@@ -1189,7 +1180,6 @@ public class OberonParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, OP_GEQ);
     if (!r) r = consumeToken(b, OP_IN);
     if (!r) r = consumeToken(b, OP_IS);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -1395,14 +1385,8 @@ public class OberonParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // STRING_LITERAL
-  public static boolean string(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "string")) return false;
-    if (!nextTokenIs(b, STRING_LITERAL)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, STRING_LITERAL);
-    exit_section_(b, m, STRING, r);
-    return r;
+  static boolean string(PsiBuilder b, int l) {
+    return consumeToken(b, STRING_LITERAL);
   }
 
   /* ********************************************************** */

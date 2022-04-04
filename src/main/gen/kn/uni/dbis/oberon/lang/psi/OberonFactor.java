@@ -20,12 +20,6 @@ public interface OberonFactor extends PsiElement {
   OberonFactor getFactor();
 
   @Nullable
-  OberonNumber getNumber();
-
-  @Nullable
   OberonSet getSet();
-
-  @Nullable
-  OberonString getString();
 
 }

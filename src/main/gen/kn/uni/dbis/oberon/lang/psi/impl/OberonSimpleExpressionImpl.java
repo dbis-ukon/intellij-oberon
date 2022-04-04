@@ -29,12 +29,6 @@ public class OberonSimpleExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
-  public List<OberonAndOperator> getAndOperatorList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonAndOperator.class);
-  }
-
-  @Override
-  @NotNull
   public List<OberonTerm> getTermList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonTerm.class);
   }

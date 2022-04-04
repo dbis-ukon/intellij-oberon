@@ -11,19 +11,11 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitAndOperator(@NotNull OberonAndOperator o) {
-    visitPsiElement(o);
-  }
-
   public void visitArrayType(@NotNull OberonArrayType o) {
     visitPsiElement(o);
   }
 
   public void visitAssignment(@NotNull OberonAssignment o) {
-    visitPsiElement(o);
-  }
-
-  public void visitBuiltinType(@NotNull OberonBuiltinType o) {
     visitPsiElement(o);
   }
 
@@ -107,14 +99,6 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitMultOperator(@NotNull OberonMultOperator o) {
-    visitPsiElement(o);
-  }
-
-  public void visitNumber(@NotNull OberonNumber o) {
-    visitPsiElement(o);
-  }
-
   public void visitPointerType(@NotNull OberonPointerType o) {
     visitPsiElement(o);
   }
@@ -147,10 +131,6 @@ public class OberonVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitRelation(@NotNull OberonRelation o) {
-    visitPsiElement(o);
-  }
-
   public void visitRepeatStatement(@NotNull OberonRepeatStatement o) {
     visitPsiElement(o);
   }
@@ -168,10 +148,6 @@ public class OberonVisitor extends PsiElementVisitor {
   }
 
   public void visitStatement(@NotNull OberonStatement o) {
-    visitPsiElement(o);
-  }
-
-  public void visitString(@NotNull OberonString o) {
     visitPsiElement(o);
   }
 

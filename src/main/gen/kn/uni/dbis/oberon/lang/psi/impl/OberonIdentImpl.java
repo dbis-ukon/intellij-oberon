@@ -27,10 +27,4 @@ public class OberonIdentImpl extends ASTWrapperPsiElement implements OberonIdent
     else super.accept(visitor);
   }
 
-  @Override
-  @Nullable
-  public OberonBuiltinType getBuiltinType() {
-    return findChildByClass(OberonBuiltinType.class);
-  }
-
 }

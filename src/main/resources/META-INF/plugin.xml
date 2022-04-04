@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>kn.uni.dbis.oberon.lang</id>
     <name>Oberon</name>
-    <version>0.0.1-alpha</version>
+    <version>0.0.2-alpha</version>
     <vendor url="https://dbis.uni.kn" email="dbis@uni-konstanz.de">University of Konstanz (DBIS)</vendor>
     <idea-version since-build="211" until-build="221.*"/>
     <description>

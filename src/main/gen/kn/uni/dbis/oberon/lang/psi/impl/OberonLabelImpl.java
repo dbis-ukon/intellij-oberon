@@ -33,10 +33,4 @@ public class OberonLabelImpl extends ASTWrapperPsiElement implements OberonLabel
     return findChildByClass(OberonQualident.class);
   }
 
-  @Override
-  @Nullable
-  public OberonString getString() {
-    return findChildByClass(OberonString.class);
-  }
-
 }

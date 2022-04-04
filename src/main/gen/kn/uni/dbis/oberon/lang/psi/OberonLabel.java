@@ -10,7 +10,4 @@ public interface OberonLabel extends PsiElement {
   @Nullable
   OberonQualident getQualident();
 
-  @Nullable
-  OberonString getString();
-
 }

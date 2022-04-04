@@ -10,7 +10,4 @@ public interface OberonTerm extends PsiElement {
   @NotNull
   List<OberonFactor> getFactorList();
 
-  @NotNull
-  List<OberonMultOperator> getMultOperatorList();
-
 }

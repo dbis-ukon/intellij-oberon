@@ -53,20 +53,8 @@ public class OberonFactorImpl extends ASTWrapperPsiElement implements OberonFact
 
   @Override
   @Nullable
-  public OberonNumber getNumber() {
-    return findChildByClass(OberonNumber.class);
-  }
-
-  @Override
-  @Nullable
   public OberonSet getSet() {
     return findChildByClass(OberonSet.class);
-  }
-
-  @Override
-  @Nullable
-  public OberonString getString() {
-    return findChildByClass(OberonString.class);
   }
 
 }

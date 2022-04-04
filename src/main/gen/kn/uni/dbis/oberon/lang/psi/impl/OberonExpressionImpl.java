@@ -28,12 +28,6 @@ public class OberonExpressionImpl extends ASTWrapperPsiElement implements Oberon
   }
 
   @Override
-  @Nullable
-  public OberonRelation getRelation() {
-    return findChildByClass(OberonRelation.class);
-  }
-
-  @Override
   @NotNull
   public List<OberonSimpleExpression> getSimpleExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonSimpleExpression.class);

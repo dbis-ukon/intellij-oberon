@@ -33,10 +33,4 @@ public class OberonTermImpl extends ASTWrapperPsiElement implements OberonTerm {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonFactor.class);
   }
 
-  @Override
-  @NotNull
-  public List<OberonMultOperator> getMultOperatorList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OberonMultOperator.class);
-  }
-
 }

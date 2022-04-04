@@ -8,9 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface OberonSimpleExpression extends PsiElement {
 
   @NotNull
-  List<OberonAndOperator> getAndOperatorList();
-
-  @NotNull
   List<OberonTerm> getTermList();
 
 }
