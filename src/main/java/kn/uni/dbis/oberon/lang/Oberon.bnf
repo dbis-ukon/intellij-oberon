@@ -161,7 +161,7 @@ assignment ::= designator OP_BECOMES expression {pin=2}
 procedure_call ::= designator [ actual_parameters ]
 if_statement ::= KW_IF expression KW_THEN <<semicolon_list statement>>
                  ( KW_ELSIF expression KW_THEN <<semicolon_list statement>> )*
-                 [ KW_ELSE <<semicolon_list statement>> ] KW_END
+                 [ KW_ELSE <<semicolon_list statement>> ] KW_END {pin=4}
 case_statement ::= KW_CASE expression KW_OF case ( PIPE case ) KW_END
 case ::= [ <<comma_list label_range>> COLON <<semicolon_list statement>> ]
 label_range ::= label [ RANGE label ]
@@ -182,7 +182,7 @@ declaration_sequence ::= [ KW_CONST ( const_declaration SEMICOLON )* ]
                          [ variable_section ]
                          ( procedure_declaration SEMICOLON )*
 variable_section ::= KW_VAR variable_declarations {pin=1 recoverWhile=variables_rec}
-private variable_declarations ::= variable_declaration+ {recoverWhile=block_local_end_rec}
+private variable_declarations ::= variable_declaration+ //{recoverWhile=block_local_end_rec}
 private variable_declaration ::= <<comma_list identdef>> COLON type SEMICOLON {pin=1}
 
 formal_parameters ::= LPAREN [ <<semicolon_list fp_section>> ] RPAREN [ COLON qualident ]
